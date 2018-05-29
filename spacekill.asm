@@ -3,10 +3,12 @@ CHROUT    = $ffd2
 SCREEN    = $0400
 SCR_CO    = $d800
 RST_LN    = $d012
+INT_STA   = $d019
 BDR_CO    = $d020
 BKG_CO    = $d021
 
-pos       = $02
+COUNT     = 8
+cnt       = $02
 
           .code
 
@@ -40,12 +42,19 @@ loop2:    sta SCR_CO + 40,x
           cpx #40
           bne loop2
 
-          ldy #0
+          ; init cnt
+          lda #COUNT
+          sta cnt
 
+          ldy #0    ; init position
           ; wait until raster hit bottom border
 mloop:    lda #$ff
 l1:       cmp RST_LN
           bne l1
+
+          ; if not time to update, burn more cycles
+          lda cnt
+          bne burn
 
           ; clear row
           ldx #0
@@ -58,9 +67,20 @@ l2:       sta SCREEN + 40,x
           ; turn on next block
           lda #$a0          
           sta SCREEN + 40,y
+
+          lda #COUNT
+          sta cnt
           iny
           cpy #40
-          bne skip
+          bne next
           ldy #0
+          jmp mloop
 
-skip:     jmp mloop
+          ; enough cycles for raster to pass line $ff (63 cycles a line)
+burn:     ldx #13
+l3:       dex
+          bne l3
+
+          dec cnt
+
+next:     jmp mloop
