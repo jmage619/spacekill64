@@ -3,8 +3,6 @@ CHROUT    = $ffd2
 SCREEN    = $0400
 SCR_CO    = $d800
 RST_LN    = $d012
-INT_CTL   = $d01a
-INT_STA   = $d019
 BDR_CO    = $d020
 BKG_CO    = $d021
 
@@ -42,61 +40,27 @@ loop2:    sta SCR_CO + 40,x
           cpx #40
           bne loop2
 
-          ; initialize position
-          lda #$0
-          sta pos
+          ldy #0
 
-          sei
-
-          ; turn off CIA timers
-          lda #$7f
-          sta $dc0d
-          sta $dd0d
-
-          ; clear pending CIA timer interrupts
-          lda $dc0d
-          lda $dd0d
-
-          ; enable raster interrupt
-          lda #$01
-          sta INT_CTL
-
-          ; point interrupt to irq
-          lda #<irq
-          sta $314
-          lda #>irq
-          sta $315
-
-          ; fire interrupt when hit bottom border
-          lda #$ff
-          sta RST_LN
-          lda RST_LN - 1
-          and #$7f
-          sta RST_LN - 1
-
-          cli
-          jmp *
-
-irq:
-          ; ack raster IRQ
-          dec INT_STA         
+          ; wait until raster hit bottom border
+mloop:    lda #$ff
+l1:       cmp RST_LN
+          bne l1
 
           ; clear row
           ldx #0
-l1:       lda #$20
-          sta SCREEN + 40,x
+          lda #$20
+l2:       sta SCREEN + 40,x
           inx
           cpx #40
-          bne l1
+          bne l2
 
           ; turn on next block
-          ldx pos
           lda #$a0          
-          sta SCREEN + 40,x
-          inx
-          cpx #40
+          sta SCREEN + 40,y
+          iny
+          cpy #40
           bne skip
-          ldx #0
-skip:     stx pos
+          ldy #0
 
-          jmp $ea31
+skip:     jmp mloop
