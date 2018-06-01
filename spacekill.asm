@@ -1,3 +1,6 @@
+          .include "input.inc"
+          .include "zeropage.inc"
+
 CHROUT    = $ffd2
 
 SCREEN    = $0400
@@ -14,7 +17,7 @@ SPR_Y     = $d001
 SPR_MX    = $d010
 
 COUNT     = 3
-cnt       = $02
+cnt       = $03
 
           .code
 
@@ -47,6 +50,8 @@ cnt       = $02
           lda #COUNT          ; init cnt
           sta cnt
 
+          jsr init_input
+
           lda #<(sprite / 64) ; define sprite
           sta SPR_P
           lda #$1
@@ -63,6 +68,31 @@ cnt       = $02
 mloop:    lda #$ff            ; wait until raster hit bottom border
 l1:       cmp RST_LN
           bne l1
+
+          lda #1<<1           ; check L
+          bit INPUT
+          beq check_R
+
+          dec SPR_X
+          dec SPR_X
+
+check_R:  lda #1<<3
+          bit INPUT
+          beq check_U
+          inc SPR_X
+          inc SPR_X
+
+check_U:  lda #1
+          bit INPUT
+          beq check_D
+          dec SPR_Y
+          dec SPR_Y
+
+check_D:  lda #1<<2
+          bit INPUT
+          beq next_in
+          inc SPR_Y
+          inc SPR_Y
 
 ;          lda cnt             ; if not time to update, burn more cycles
 ;          bne burn
@@ -85,9 +115,10 @@ l1:       cmp RST_LN
 ;          ldy #0
 ;          jmp mloop
           
-burn:     ldx #13             ; enough cycles for raster to pass
-l3:       dex                 ; line $ff (63 cycles a line)
-          bne l3
+;burn:     ldx #13             ; enough cycles for raster to pass
+;l3:       dex                 ; line $ff (63 cycles a line)
+;          bne l3
+next_in:   jsr read_input
 
 ;          dec cnt
 
