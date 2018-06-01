@@ -15,9 +15,7 @@ SPR_CO    = $d027
 SPR_X     = $d000
 SPR_Y     = $d001
 SPR_MX    = $d010
-
-COUNT     = 3
-cnt       = $03
+SPR_CLB   = $d01f
 
           .code
 
@@ -30,25 +28,8 @@ cnt       = $03
           lda #$93            ; clear screen
           jsr CHROUT
 
-;          ldx #0
-;loop:     lda #$a0
-;          sta SCREEN,x
-;
-;          txa
-;          sta SCR_CO,x
-;          inx
-;          cpx #$10
-;          bne loop
-
-;          lda #$5             ; color row 2 green
-;          ldx #0
-;loop2:    sta SCR_CO + 40,x
-;          inx
-;          cpx #40
-;          bne loop2
-
-          lda #COUNT          ; init cnt
-          sta cnt
+          lda #$a0
+          sta SCREEN + 5 * 40 + 10
 
           jsr init_input
 
@@ -68,7 +49,11 @@ cnt       = $03
 mloop:    lda #$ff            ; wait until raster hit bottom border
 l1:       cmp RST_LN
           bne l1
+                              ; display should be updated first as much as possible
 
+          jsr read_input      ; get input
+
+                              ; update sprite pos
           lda #1<<1           ; check L
           bit INPUT
           beq check_R
@@ -90,37 +75,24 @@ check_U:  lda #1
 
 check_D:  lda #1<<2
           bit INPUT
-          beq next_in
+          beq chk_hit
           inc SPR_Y
           inc SPR_Y
 
-;          lda cnt             ; if not time to update, burn more cycles
-;          bne burn
-;
-;          ldx #0              ; clear row
-;          lda #$20
-;l2:       sta SCREEN + 40,x
-;          inx
-;          cpx #40
-;          bne l2
-;
-;          lda #$a0           ; turn on next block
-;          sta SCREEN + 40,y
-;
-;          lda #COUNT
-;          sta cnt
-;          iny
-;          cpy #40
-;          bne next
-;          ldy #0
-;          jmp mloop
-          
+chk_hit:  lda #1              ; check if sprite hit background
+          bit SPR_CLB
+          beq no_hit
+
+          lda #2              ; color red if hit
+          sta SPR_CO
+          jmp next
+
+no_hit:   lda #1              ; otherwise color white
+          sta SPR_CO
+
 ;burn:     ldx #13             ; enough cycles for raster to pass
 ;l3:       dex                 ; line $ff (63 cycles a line)
 ;          bne l3
-next_in:   jsr read_input
-
-;          dec cnt
 
 next:     jmp mloop
 
