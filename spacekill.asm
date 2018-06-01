@@ -18,16 +18,13 @@ cnt       = $02
 
           .code
 
-          ; gray border
-          lda #$0b
+          lda #$0b            ; gray border
           sta BDR_CO          
 
-          ; black background
-          lda #$00
+          lda #$00            ; black background
           sta BKG_CO
 
-          ; clear screen
-          lda #$93
+          lda #$93            ; clear screen
           jsr CHROUT
 
 ;          ldx #0
@@ -40,19 +37,17 @@ cnt       = $02
 ;          cpx #$10
 ;          bne loop
 
-;          ; color row 2 green
-;          lda #$5
+;          lda #$5             ; color row 2 green
 ;          ldx #0
 ;loop2:    sta SCR_CO + 40,x
 ;          inx
 ;          cpx #40
 ;          bne loop2
 
-          ; init cnt
-          lda #COUNT
+          lda #COUNT          ; init cnt
           sta cnt
-fake1:	nop		; fake comment
-fake2:	lda #<(sprite / 64)	; define sprite
+
+          lda #<(sprite / 64) ; define sprite
           sta SPR_P
           lda #$1
           ora SPR_EN
@@ -63,28 +58,23 @@ fake2:	lda #<(sprite / 64)	; define sprite
           sta SPR_X
           lda #80
           sta SPR_Y
-          
 
-          ldy #0    ; init position
-          ; wait until raster hit bottom border
-mloop:    lda #$ff
+          ldy #0              ; init position
+mloop:    lda #$ff            ; wait until raster hit bottom border
 l1:       cmp RST_LN
           bne l1
 
-;          ; if not time to update, burn more cycles
-;          lda cnt
+;          lda cnt             ; if not time to update, burn more cycles
 ;          bne burn
 ;
-;          ; clear row
-;          ldx #0
+;          ldx #0              ; clear row
 ;          lda #$20
 ;l2:       sta SCREEN + 40,x
 ;          inx
 ;          cpx #40
 ;          bne l2
 ;
-;          ; turn on next block
-;          lda #$a0          
+;          lda #$a0           ; turn on next block
 ;          sta SCREEN + 40,y
 ;
 ;          lda #COUNT
@@ -94,10 +84,9 @@ l1:       cmp RST_LN
 ;          bne next
 ;          ldy #0
 ;          jmp mloop
-
-          ; enough cycles for raster to pass line $ff (63 cycles a line)
-burn:     ldx #13
-l3:       dex
+          
+burn:     ldx #13             ; enough cycles for raster to pass
+l3:       dex                 ; line $ff (63 cycles a line)
           bne l3
 
 ;          dec cnt
