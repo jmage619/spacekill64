@@ -51,9 +51,8 @@ cnt       = $02
           ; init cnt
           lda #COUNT
           sta cnt
-
-          ; define sprite
-          lda #<(sprite / 64)
+fake1:	nop		; fake comment
+fake2:	lda #<(sprite / 64)	; define sprite
           sta SPR_P
           lda #$1
           ora SPR_EN
