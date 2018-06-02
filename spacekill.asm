@@ -17,6 +17,8 @@ SPR_Y     = $d001
 SPR_MX    = $d010
 SPR_CLB   = $d01f
 
+speed     = 2
+
           .code
 
           lda #$0b            ; gray border
@@ -57,27 +59,44 @@ l1:       cmp RST_LN
           lda #1<<1           ; check L
           bit INPUT
           beq check_R
+          lda SPR_X
+          sec
+          sbc #speed
+          sta SPR_X
+          bcs check_R         ; if borrow, clear upper bit of SPR_X
 
-          dec SPR_X
-          dec SPR_X
+          lda SPR_MX
+          and #<~1
+          sta SPR_MX
 
 check_R:  lda #1<<3
           bit INPUT
           beq check_U
-          inc SPR_X
-          inc SPR_X
+          lda SPR_X
+          clc
+          adc #speed
+          sta SPR_X
+          bcc check_U         ; if carry, set upper bit of SPR_X
+
+          lda #1
+          ora SPR_MX
+          sta SPR_MX
 
 check_U:  lda #1
           bit INPUT
           beq check_D
-          dec SPR_Y
-          dec SPR_Y
+          lda SPR_Y
+          sec
+          sbc #speed
+          sta SPR_Y
 
 check_D:  lda #1<<2
           bit INPUT
           beq chk_hit
-          inc SPR_Y
-          inc SPR_Y
+          lda SPR_Y
+          clc
+          adc #speed
+          sta SPR_Y
 
 chk_hit:  lda #1              ; check if sprite hit background
           bit SPR_CLB
