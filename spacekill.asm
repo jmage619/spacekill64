@@ -18,6 +18,7 @@ SPR_MX    = $d010
 SPR_CLB   = $d01f
 
 speed     = 2
+x_chr     = $03
 
           .code
 
@@ -42,9 +43,9 @@ speed     = 2
           sta SPR_EN
           lda #1
           sta SPR_CO
-          lda #30
+          lda #24
           sta SPR_X
-          lda #80
+          lda #50
           sta SPR_Y
 
           ldy #0              ; init position
@@ -113,7 +114,27 @@ no_hit:   lda #1              ; otherwise color white
 ;l3:       dex                 ; line $ff (63 cycles a line)
 ;          bne l3
 
+          lda SPR_X           ; convert sprite coords to char coords
+          sec
+          sbc #24             ; border compensation
+          lsr                 ; start dividing by 8
+          tax
+          lda #1
+          bit SPR_MX          ; rotate in the high bit if set
+          beq shift2
+
+          txa
+          ora #$80
+          tax
+
+shift2:   txa                 ; finish dividing
+          lsr
+          lsr
+
+          sta x_chr
+
 next:     jmp mloop
+          .byte 'e','n','d'
 
           .segment "SPRITES"
 sprite:   .byte %00010000, %00000000, %00000000
