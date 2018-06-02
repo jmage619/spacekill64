@@ -19,6 +19,9 @@ SPR_CLB   = $d01f
 
 speed     = 2
 x_chr     = $03
+y_chr     = $04
+scr_p     = $05
+wtmp      = $07
 
           .code
 
@@ -114,27 +117,62 @@ no_hit:   lda #1              ; otherwise color white
 ;l3:       dex                 ; line $ff (63 cycles a line)
 ;          bne l3
 
-          lda SPR_X           ; convert sprite coords to char coords
-          sec
-          sbc #24             ; border compensation
-          lsr                 ; start dividing by 8
-          tax
-          lda #1
-          bit SPR_MX          ; rotate in the high bit if set
-          beq shift2
+          lda #0              ; convert sprite coords to char coords
+          sta >wtmp           ; store sprite x to tmp var to handle
+          lda #1              ; hi bit
+          bit SPR_MX
+          beq lo
+          sta >wtmp
 
-          txa
-          ora #$80
-          tax
+lo:       lda SPR_X
+          sta <wtmp
 
-shift2:   txa                 ; finish dividing
+          sec                 ; border compensation
+          sbc #24
+          sta <wtmp
+          lda >wtmp
+          sbc #0
+          sta >wtmp
+
+          lda <wtmp
+          lsr >wtmp           ; divide by 8
+          ror
           lsr
           lsr
 
           sta x_chr
 
+          lda SPR_Y           ; get y
+          sec
+          sbc #50             ; border compensation
+          lsr                 ; divide by 8
+          lsr
+          lsr
+
+          sta y_chr
+
+          lda y_chr
+          asl
+          tax
+          lda scr_rt,x
+          sta scr_p
+          lda scr_rt + 1,x
+          sta scr_p + 1
+
+          ldy x_chr
+          lda #$a0
+          sta (scr_p),y
+
 next:     jmp mloop
           .byte 'e','n','d'
+
+          .rodata
+          .byte 'r','o','d'
+scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
+          .word SCREEN+ 5*40, SCREEN+ 6*40, SCREEN+ 7*40, SCREEN+ 8*40, SCREEN +9*40
+          .word SCREEN+10*40, SCREEN+11*40, SCREEN+12*40, SCREEN+13*40, SCREEN+14*40
+          .word SCREEN+15*40, SCREEN+16*40, SCREEN+17*40, SCREEN+18*40, SCREEN+19*40
+          .word SCREEN+20*40, SCREEN+21*40, SCREEN+22*40, SCREEN+23*40, SCREEN+24*40
 
           .segment "SPRITES"
 sprite:   .byte %00010000, %00000000, %00000000
