@@ -46,7 +46,7 @@ wtmp      = $07
           sta SPR_EN
           lda #1
           sta SPR_CO
-          lda #24
+          lda #48
           sta SPR_X
           lda #50
           sta SPR_Y
@@ -108,7 +108,7 @@ chk_hit:  lda #1              ; check if sprite hit background
 
           lda #2              ; color red if hit
           sta SPR_CO
-          jmp next
+          jmp bullet
 
 no_hit:   lda #1              ; otherwise color white
           sta SPR_CO
@@ -117,25 +117,25 @@ no_hit:   lda #1              ; otherwise color white
 ;l3:       dex                 ; line $ff (63 cycles a line)
 ;          bne l3
 
-          lda #0              ; convert sprite coords to char coords
-          sta >wtmp           ; store sprite x to tmp var to handle
+bullet:   lda #0              ; convert sprite coords to char coords
+          sta wtmp+1          ; store sprite x to tmp var to handle
           lda #1              ; hi bit
           bit SPR_MX
           beq lo
-          sta >wtmp
+          sta wtmp+1
 
 lo:       lda SPR_X
-          sta <wtmp
+          sta wtmp
 
           sec                 ; border compensation
           sbc #24
-          sta <wtmp
-          lda >wtmp
+          sta wtmp
+          lda wtmp + 1
           sbc #0
-          sta >wtmp
+          sta wtmp + 1
 
-          lda <wtmp
-          lsr >wtmp           ; divide by 8
+          lda wtmp
+          lsr wtmp + 1        ; divide by 8
           ror
           lsr
           lsr
