@@ -115,7 +115,7 @@ no_hit:   lda #1              ; otherwise color white
 
 next:     jmp mloop
 
-          .data
+          .segment "SPRITES"
 sprite:   .byte %00010000, %00000000, %00000000
           .byte %00011100, %00000000, %00000000
           .byte %00010011, %00000000, %00000000
