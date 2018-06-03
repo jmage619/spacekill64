@@ -46,9 +46,9 @@ wtmp      = $07
           sta SPR_EN
           lda #1
           sta SPR_CO
-          lda #48
+          lda #31
           sta SPR_X
-          lda #50
+          lda #57
           sta SPR_Y
 
           ldy #0              ; init position
@@ -140,6 +140,8 @@ lo:       lda SPR_X
           lsr
           lsr
 
+          clc
+          adc #4              ; correct x pos rel to sprite
           sta x_chr
 
           lda SPR_Y           ; get y
@@ -149,6 +151,8 @@ lo:       lda SPR_X
           lsr
           lsr
 
+          clc
+          adc #1              ; correct y pos rel to sprite
           sta y_chr
 
           lda y_chr
