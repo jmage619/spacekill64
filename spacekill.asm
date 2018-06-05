@@ -22,6 +22,7 @@ x_chr     = $03
 y_chr     = $04
 scr_p     = $05
 wtmp      = $07
+flags     = $09
 
 .struct Bullets
     i       .byte 8
@@ -44,6 +45,8 @@ wtmp      = $07
           lda #$a0
           sta SCREEN + 5 * 40 + 10
 
+          lda #0
+          sta flags
           jsr init_input
 
           lda #<(sprite / 64) ; define sprite
@@ -112,9 +115,21 @@ check_D:  lda #1<<2
           sta SPR_Y
 
 check_K:  lda #1<<4           ; shoot if K pressed
-          bit INPUT           ; should check if pressed before
-          beq chk_hit         ; to prevent autofire
+          bit INPUT
+          beq fire_off
+
+          lda #1              ; only fire if not pressed previously
+          bit flags
+          bne fire_on
           jsr create_bullet
+fire_on:  lda flags           ; set pressed
+          ora #1
+          sta flags
+          jmp chk_hit
+
+fire_off: lda flags           ; clear pressed
+          and #<~1
+          sta flags
 
 chk_hit:  lda #1              ; check if sprite hit background
           bit SPR_CLB
