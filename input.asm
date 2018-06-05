@@ -32,7 +32,7 @@ KEY_INT   = $dc0d
           lda #$0
           sta KEY_DB
 
-loop:     lda #<~(1<<1)       ; enable A column
+          lda #<~(1<<1)       ; enable A column
           sta KEY_PA
 
           lda #1<<2           ; test A
@@ -116,11 +116,11 @@ l:        lda #<~(1<<5)       ; enable L column
           lda INPUT
           ora #1<<5
           sta INPUT
-          jmp loop
+          jmp return
 
 offl:     lda INPUT
           and #<~(1<<5)
           sta INPUT
 
-          rts
+return:   rts
 .endproc
