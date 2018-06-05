@@ -23,6 +23,12 @@ y_chr     = $04
 scr_p     = $05
 wtmp      = $07
 
+.struct Bullets
+    i       .byte 8
+    j       .byte 8
+    flags   .byte 8
+.endstruct
+
           .code
 
           lda #$0b            ; gray border
@@ -96,11 +102,16 @@ check_U:  lda #1
 
 check_D:  lda #1<<2
           bit INPUT
-          beq chk_hit
+          beq check_K
           lda SPR_Y
           clc
           adc #speed
           sta SPR_Y
+
+check_K:  lda #1<<4           ; shoot if K pressed
+          bit INPUT           ; should check if pressed before
+          beq chk_hit         ; to prevent autofire
+          jsr create_bullet
 
 chk_hit:  lda #1              ; check if sprite hit background
           bit SPR_CLB
@@ -108,7 +119,7 @@ chk_hit:  lda #1              ; check if sprite hit background
 
           lda #2              ; color red if hit
           sta SPR_CO
-          jmp bullet
+          jmp next
 
 no_hit:   lda #1              ; otherwise color white
           sta SPR_CO
@@ -117,7 +128,22 @@ no_hit:   lda #1              ; otherwise color white
 ;l3:       dex                 ; line $ff (63 cycles a line)
 ;          bne l3
 
-bullet:   lda #0              ; convert sprite coords to char coords
+next:     jmp mloop
+          .byte 'e','n','d'
+
+.proc     create_bullet
+          ldx #0
+l1:       lda bullets+Bullets::flags,x ; look for first available bullet
+          and #1
+          beq coords
+          inx
+          cpx #8
+          beq return                   ; if none available just exit
+          jmp l1
+
+coords:   lda #1
+          sta bullets+Bullets::flags,x
+          lda #0              ; convert sprite coords to char coords
           sta wtmp+1          ; store sprite x to tmp var to handle
           lda #1              ; hi bit
           bit SPR_MX
@@ -142,7 +168,7 @@ lo:       lda SPR_X
 
           clc
           adc #4              ; correct x pos rel to sprite
-          sta x_chr
+          sta bullets+Bullets::i,x
 
           lda SPR_Y           ; get y
           sec
@@ -153,22 +179,21 @@ lo:       lda SPR_X
 
           clc
           adc #1              ; correct y pos rel to sprite
-          sta y_chr
+          sta bullets+Bullets::j,x
 
-          lda y_chr
           asl
-          tax
-          lda scr_rt,x
+          tay
+          lda scr_rt,y
           sta scr_p
-          lda scr_rt + 1,x
+          lda scr_rt + 1,y
           sta scr_p + 1
 
-          ldy x_chr
+          ldy bullets+Bullets::i,x
           lda #$a0
           sta (scr_p),y
 
-next:     jmp mloop
-          .byte 'e','n','d'
+return:   rts
+.endproc
 
           .rodata
           .byte 'r','o','d'
@@ -177,6 +202,9 @@ scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 
           .word SCREEN+10*40, SCREEN+11*40, SCREEN+12*40, SCREEN+13*40, SCREEN+14*40
           .word SCREEN+15*40, SCREEN+16*40, SCREEN+17*40, SCREEN+18*40, SCREEN+19*40
           .word SCREEN+20*40, SCREEN+21*40, SCREEN+22*40, SCREEN+23*40, SCREEN+24*40
+
+          .bss
+bullets:  .tag Bullets
 
           .segment "SPRITES"
 sprite:   .byte %00011000, %00000000, %00000000
