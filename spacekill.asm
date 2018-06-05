@@ -28,7 +28,6 @@ flags     = $09
     i       .byte 8
     j       .byte 8
     flags   .byte 8
-    prev    .byte 8
 .endstruct
 
           .code
@@ -210,18 +209,6 @@ lo:       lda SPR_X
           clc
           adc #1              ; correct y pos rel to sprite
           sta bullets+Bullets::i,x
-
-          asl
-          tay
-          lda scr_rt,y
-          sta scr_p
-          lda scr_rt + 1,y
-          sta scr_p + 1
-
-          ldy bullets+Bullets::j,x
-          lda (scr_p),y
-          sta bullets+Bullets::prev,x
-
 return:   rts
 .endproc
 
@@ -240,7 +227,7 @@ l1:       lda bullets+Bullets::flags,x
           sta scr_p + 1
 
           ldy bullets+Bullets::j,x
-          lda bullets+Bullets::prev,x
+          lda #$20                      ; blank out prev on screen
           sta (scr_p),y
 
           iny
@@ -248,9 +235,7 @@ l1:       lda bullets+Bullets::flags,x
           beq disable
 
           tya
-          sta bullets+Bullets::j,x
-          lda (scr_p),y
-          sta bullets+Bullets::prev,x
+          sta bullets+Bullets::j,x      ; update bullet on screen
           lda #$a0
           sta (scr_p),y
 next:     inx
