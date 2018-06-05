@@ -197,7 +197,7 @@ lo:       lda SPR_X
           lsr
 
           clc
-          adc #4              ; correct x pos rel to sprite
+          adc #3              ; correct x pos rel to sprite
           sta bullets+Bullets::j,x
 
           lda SPR_Y           ; get y
@@ -221,8 +221,6 @@ lo:       lda SPR_X
           ldy bullets+Bullets::j,x
           lda (scr_p),y
           sta bullets+Bullets::prev,x
-          lda #$a0
-          sta (scr_p),y
 
 return:   rts
 .endproc
