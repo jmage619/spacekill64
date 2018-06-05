@@ -170,7 +170,8 @@ l1:       lda bullets+Bullets::flags,x ; look for first available bullet
           beq return                   ; if none available just exit
           jmp l1
 
-coords:   lda #1
+coords:   lda bullets+Bullets::flags,x
+          ora #1
           sta bullets+Bullets::flags,x
           lda #0              ; convert sprite coords to char coords
           sta wtmp+1          ; store sprite x to tmp var to handle
@@ -230,6 +231,7 @@ return:   rts
 .proc     update_bullets
           ldx #0
 l1:       lda bullets+Bullets::flags,x
+          and #1
           beq next
           lda bullets+Bullets::i,x
           asl
@@ -259,7 +261,8 @@ next:     inx
 
           rts
 
-disable:  lda #0
+disable:  lda bullets+Bullets::flags,x
+          and #<~1
           sta bullets+Bullets::flags,x
           jmp next
 .endproc
