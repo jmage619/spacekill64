@@ -51,8 +51,8 @@ flags     = $09
 
           lda #<(sprite / 64) ; define sprite
           sta SPR_P
-          lda #$1
-          ora SPR_EN
+          lda SPR_EN
+          ora #1
           sta SPR_EN
           lda #1
           sta SPR_CO
@@ -94,8 +94,8 @@ check_R:  lda #1<<3
           sta SPR_X
           bcc check_U         ; if carry, set upper bit of SPR_X
 
-          lda #1
-          ora SPR_MX
+          lda SPR_MX
+          ora #1
           sta SPR_MX
 
 check_U:  lda #1
