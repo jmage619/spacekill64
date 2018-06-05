@@ -27,6 +27,7 @@ wtmp      = $07
     i       .byte 8
     j       .byte 8
     flags   .byte 8
+    prev    .byte 8
 .endstruct
 
           .code
@@ -56,6 +57,8 @@ wtmp      = $07
           sta SPR_X
           lda #57
           sta SPR_Y
+
+          jsr init_bullets
 
           ldy #0              ; init position
 mloop:    lda #$ff            ; wait until raster hit bottom border
@@ -119,7 +122,7 @@ chk_hit:  lda #1              ; check if sprite hit background
 
           lda #2              ; color red if hit
           sta SPR_CO
-          jmp next
+          jmp update
 
 no_hit:   lda #1              ; otherwise color white
           sta SPR_CO
@@ -128,8 +131,19 @@ no_hit:   lda #1              ; otherwise color white
 ;l3:       dex                 ; line $ff (63 cycles a line)
 ;          bne l3
 
-next:     jmp mloop
+update:   jsr update_bullets
+          jmp mloop
           .byte 'e','n','d'
+
+.proc     init_bullets
+          lda #0
+          ldx #0
+next:     sta bullets+Bullets::flags,x
+          inx
+          cpx #8
+          bne next
+          rts
+.endproc
 
 .proc     create_bullet
           ldx #0
@@ -168,7 +182,7 @@ lo:       lda SPR_X
 
           clc
           adc #4              ; correct x pos rel to sprite
-          sta bullets+Bullets::i,x
+          sta bullets+Bullets::j,x
 
           lda SPR_Y           ; get y
           sec
@@ -179,7 +193,7 @@ lo:       lda SPR_X
 
           clc
           adc #1              ; correct y pos rel to sprite
-          sta bullets+Bullets::j,x
+          sta bullets+Bullets::i,x
 
           asl
           tay
@@ -188,11 +202,51 @@ lo:       lda SPR_X
           lda scr_rt + 1,y
           sta scr_p + 1
 
-          ldy bullets+Bullets::i,x
+          ldy bullets+Bullets::j,x
+          lda (scr_p),y
+          sta bullets+Bullets::prev,x
           lda #$a0
           sta (scr_p),y
 
 return:   rts
+.endproc
+
+.byte     'u','d','b'
+.proc     update_bullets
+          ldx #0
+l1:       lda bullets+Bullets::flags,x
+          beq next
+          lda bullets+Bullets::i,x
+          asl
+          tay
+          lda scr_rt,y
+          sta scr_p
+          lda scr_rt + 1,y
+          sta scr_p + 1
+
+          ldy bullets+Bullets::j,x
+          lda bullets+Bullets::prev,x
+          sta (scr_p),y
+
+          iny
+          cpy #40
+          beq disable
+
+          tya
+          sta bullets+Bullets::j,x
+          lda (scr_p),y
+          sta bullets+Bullets::prev,x
+          lda #$a0
+          sta (scr_p),y
+next:     inx
+          cpx #8
+          bne l1
+
+          rts
+
+disable:  lda #0
+          sta bullets+Bullets::flags,x
+          jmp next
 .endproc
 
           .rodata
