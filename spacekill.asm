@@ -26,15 +26,15 @@ flags     = $09
 tmp       = $0a
 
 .struct Bullets
+    flags   .byte 8
     i       .byte 8
     j       .byte 8
-    flags   .byte 8
 .endstruct
 
 .struct Enemies
+    id      .word 8
     _x      .word 8
     _y      .word 8
-    id      .word 8
 .endstruct
 
           .code
@@ -296,11 +296,12 @@ l1:       bit SPR_EN                    ; search for first avail sprite
 return:   rts
 
 set:      sta tmp                       ; save sprite flag for max x bit
-          ora SPR_EN
+          ora SPR_EN                    ; define enemy sprite
           sta SPR_EN
-          lda #<(sprite2 / 64)          ; define enemy sprite
+          tya
+          sta enemies+Enemies::id,x     ; save offset
+          lda #<(sprite2 / 64)
           sta SPR_P,y
-          sta enemies+Enemies::id,x
           lda #1
           sta SPR_CO,y
           tya                           ; sprite x,y are in pairs so
