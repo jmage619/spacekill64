@@ -23,11 +23,18 @@ y_chr     = $04
 scr_p     = $05
 wtmp      = $07
 flags     = $09
+tmp       = $0a
 
 .struct Bullets
     i       .byte 8
     j       .byte 8
     flags   .byte 8
+.endstruct
+
+.struct Enemies
+    _x      .word 8
+    _y      .word 8
+    id      .word 8
 .endstruct
 
           .code
@@ -60,17 +67,19 @@ flags     = $09
           lda #57
           sta SPR_Y
 
-          lda #<(sprite2 / 64) ; define enemy sprite
-          sta SPR_P + 1
-          lda SPR_EN
-          ora #1<<1
-          sta SPR_EN
-          lda #1
-          sta SPR_CO + 1
+          jsr init_enemies
+
           lda #255
-          sta SPR_X + 2
+          sta enemies+Enemies::_x
+          lda #0
+          sta enemies+Enemies::_x+1
           lda #128
-          sta SPR_Y + 2
+          sta enemies+Enemies::_y
+          lda #0
+          sta enemies+Enemies::_y+1
+
+          ldx #0
+          jsr create_enemy
 
           jsr init_bullets
 
@@ -262,6 +271,57 @@ disable:  lda bullets+Bullets::flags,x
           jmp next
 .endproc
 
+.proc     init_enemies
+          lda #$ff
+          ldx #0
+next:     sta enemies+Enemies::id,x
+          inx
+          inx
+          cpx #2 * 8
+          bne next
+          rts
+.endproc
+
+; input enemy index in x reg
+.proc     create_enemy
+          ldy #0
+          lda #1
+l1:       bit SPR_EN                    ; search for first avail sprite
+          beq set
+          asl
+          iny
+          cpy #8
+          bne l1                        ; bail out if none found
+
+return:   rts
+
+set:      sta tmp                       ; save sprite flag for max x bit
+          ora SPR_EN
+          sta SPR_EN
+          lda #<(sprite2 / 64)          ; define enemy sprite
+          sta SPR_P,y
+          sta enemies+Enemies::id,x
+          lda #1
+          sta SPR_CO,y
+          tya                           ; sprite x,y are in pairs so
+          asl                           ; multiply by 2 for correct offsets
+          tay
+          lda enemies+Enemies::_x,x
+          sta SPR_X,y
+          lda enemies+Enemies::_x+1,x
+          beq get_y                     ; test if sprite max x bit should be set
+
+          lda SPR_MX
+          ora tmp
+          sta SPR_MX
+
+get_y:    lda enemies+Enemies::_y,x
+          sta SPR_Y,y
+
+          jmp return
+
+.endproc
+
           .rodata
           .byte 'r','o','d'
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
@@ -272,6 +332,7 @@ scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 
 
           .bss
 bullets:  .tag Bullets
+enemies:  .tag Enemies
 
           .segment "SPRITES"
 sprite:   .byte %00011000, %00000000, %00000000
