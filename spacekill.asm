@@ -359,12 +359,12 @@ get_y:    lda enemies+Enemies::_y,x
           adc #0
           sta wtmp1+1
 
-          lda wtmp1                     ; subtract dx
-          sec
-          sbc bullet_attrs+Bullet::dx
+          lda wtmp1                     ; add dx
+          clc
+          adc bullet_attrs+Bullet::dx
           sta wtmp1
           lda wtmp1+1
-          sbc #0
+          adc #0
           sta wtmp1+1
 
           lda wtmp1                     ; save rhs
@@ -375,12 +375,12 @@ get_y:    lda enemies+Enemies::_y,x
           adc #0
           sta wtmp2+1
 
-          lda enemies+Enemies::_x,y     ; get enemy x and subtract dx
-          sec
-          sbc enemy_attrs+Enemy::dx
+          lda enemies+Enemies::_x,y     ; get enemy x and add dx
+          clc
+          adc enemy_attrs+Enemy::dx
           sta wtmp3
           lda enemies+Enemies::_x+1,y
-          sbc #0
+          adc #0
           sta wtmp3+1
 
           lda wtmp3                     ; save rhs
@@ -408,14 +408,14 @@ rhs:      sec                           ; save greater of rhs to wtmp2
           sbc wtmp4
           lda wtmp2+1
           sbc wtmp4+1
-          bpl bound
+          bpl bound_x
 
           lda wtmp4
           sta wtmp2
           lda wtmp4+1
           sta wtmp2+1
 
-bound:    lda wtmp2                     ; store bound witdh to wtmp4
+bound_x:  lda wtmp2                     ; store bound witdh to wtmp4
           sec
           sbc wtmp1
           sta wtmp4
@@ -435,7 +435,102 @@ bound:    lda wtmp2                     ; store bound witdh to wtmp4
           sbc wtmp3
           lda wtmp4+1
           sbc wtmp3+1
-          ; continue if negative otherwise return
+          bmi test_y                    ; continue if negative otherwise return
+          rts
+
+test_y:   lda #0
+          sta wtmp1+1
+          lda bullets+Bullets::i,x
+          asl                           ; mult by 8 to translate to px
+          rol wtmp1+1
+          asl
+          rol wtmp1+1
+          asl
+          rol wtmp1+1
+
+          clc                           ; y border compensation
+          adc #50
+          sta wtmp1
+          lda wtmp1+1
+          adc #0
+          sta wtmp1+1
+
+          lda wtmp1                     ; add dy
+          clc
+          adc bullet_attrs+Bullet::dy
+          sta wtmp1
+          lda wtmp1+1
+          adc #0
+          sta wtmp1+1
+
+          lda wtmp1                     ; save bottom
+          clc
+          adc bullet_attrs+Bullet::h
+          sta wtmp2
+          lda wtmp1+1
+          adc #0
+          sta wtmp2+1
+
+          lda enemies+Enemies::_y,y     ; get enemy y and add dy
+          clc
+          adc enemy_attrs+Enemy::dy
+          sta wtmp3
+          lda enemies+Enemies::_y+1,y
+          adc #0
+          sta wtmp3+1
+
+          lda wtmp3                     ; save bottom
+          clc
+          adc enemy_attrs+Enemy::h
+          sta wtmp4
+          lda wtmp3+1
+          adc #0
+          sta wtmp4+1
+
+          sec                           ; save lower of top to wtmp1
+          lda wtmp3
+          sbc wtmp1
+          lda wtmp3+1
+          sbc wtmp1+1
+          bpl top
+
+          lda wtmp3
+          sta wtmp1
+          lda wtmp3+1
+          sta wtmp1+1
+
+top:      sec                           ; save greater of top to wtmp2
+          lda wtmp2
+          sbc wtmp4
+          lda wtmp2+1
+          sbc wtmp4+1
+          bpl bound_y
+
+          lda wtmp4
+          sta wtmp2
+          lda wtmp4+1
+          sta wtmp2+1
+
+bound_y:  lda wtmp2                     ; store bound height to wtmp4
+          sec
+          sbc wtmp1
+          sta wtmp4
+          lda wtmp2+1
+          sbc wtmp1+1
+          sta wtmp4+1
+
+          lda bullet_attrs+Bullet::h    ; store min height in wtmp3
+          clc
+          adc enemy_attrs+Enemy::h
+          sta wtmp3
+          lda #0
+          sta wtmp3+1
+
+          lda wtmp4
+          sec
+          sbc wtmp3
+          lda wtmp4+1
+          sbc wtmp3+1
 
           rts
 .endproc
