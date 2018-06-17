@@ -20,21 +20,38 @@ SPR_CLB   = $d01f
 speed     = 2
 x_chr     = $03
 y_chr     = $04
-scr_p     = $05
-wtmp      = $07
-flags     = $09
-tmp       = $0a
+flags     = $05
+tmp       = $06
+scr_p     = $07
+wtmp1     = $09
+wtmp2     = $0b
+wtmp3     = $0d
+wtmp4     = $0f
 
-.struct Bullets
-    flags   .byte 8
-    i       .byte 8
-    j       .byte 8
+.scope    Bullet
+dx        = 0
+dy        = 1
+w         = 2
+h         = 3
+.endscope
+
+.struct   Bullets
+flags     .byte 8
+i         .byte 8
+j         .byte 8
 .endstruct
 
-.struct Enemies
-    id      .word 8
-    _x      .word 8
-    _y      .word 8
+.scope    Enemy
+dx        = 0
+dy        = 1
+w         = 2
+h         = 3
+.endscope
+
+.struct   Enemies
+id        .word 8
+_x        .word 8
+_y        .word 8
 .endstruct
 
           .code
@@ -194,24 +211,24 @@ coords:   lda bullets+Bullets::flags,x
           ora #1
           sta bullets+Bullets::flags,x
           lda #0              ; convert sprite coords to char coords
-          sta wtmp+1          ; store sprite x to tmp var to handle
+          sta wtmp1+1          ; store sprite x to tmp var to handle
           lda #1              ; hi bit
           bit SPR_MX
           beq lo
-          sta wtmp+1
+          sta wtmp1+1
 
 lo:       lda SPR_X
-          sta wtmp
+          sta wtmp1
 
           sec                 ; border compensation
           sbc #24
-          sta wtmp
-          lda wtmp + 1
+          sta wtmp1
+          lda wtmp1 + 1
           sbc #0
-          sta wtmp + 1
+          sta wtmp1 + 1
 
-          lda wtmp
-          lsr wtmp + 1        ; divide by 8
+          lda wtmp1
+          lsr wtmp1 + 1        ; divide by 8
           ror
           lsr
           lsr
@@ -251,9 +268,9 @@ l1:       lda bullets+Bullets::flags,x
           lda #$20                      ; blank out prev on screen
           sta (scr_p),y
 
-          iny
-          cpy #40
-          beq disable
+          ;iny
+          ;cpy #40
+          ;beq disable
 
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
@@ -323,6 +340,106 @@ get_y:    lda enemies+Enemies::_y,x
 
 .endproc
 
+          .byte 'h','i','t'
+.proc     bullet_hit
+          lda #0
+          sta wtmp1+1
+          lda bullets+Bullets::j,x
+          asl                           ; mult by 8 to translate to px
+          rol wtmp1+1
+          asl
+          rol wtmp1+1
+          asl
+          rol wtmp1+1
+
+          clc                           ; x border compensation
+          adc #24
+          sta wtmp1
+          lda wtmp1+1
+          adc #0
+          sta wtmp1+1
+
+          lda wtmp1                     ; subtract dx
+          sec
+          sbc bullet_attrs+Bullet::dx
+          sta wtmp1
+          lda wtmp1+1
+          sbc #0
+          sta wtmp1+1
+
+          lda wtmp1                     ; save rhs
+          clc
+          adc bullet_attrs+Bullet::w
+          sta wtmp2
+          lda wtmp1+1
+          adc #0
+          sta wtmp2+1
+
+          lda enemies+Enemies::_x,y     ; get enemy x and subtract dx
+          sec
+          sbc enemy_attrs+Enemy::dx
+          sta wtmp3
+          lda enemies+Enemies::_x+1,y
+          sbc #0
+          sta wtmp3+1
+
+          lda wtmp3                     ; save rhs
+          clc
+          adc enemy_attrs+Enemy::w
+          sta wtmp4
+          lda wtmp3+1
+          adc #0
+          sta wtmp4+1
+
+          sec                           ; save lower of lhs to wtmp1
+          lda wtmp3
+          sbc wtmp1
+          lda wtmp3+1
+          sbc wtmp1+1
+          bpl rhs
+
+          lda wtmp3
+          sta wtmp1
+          lda wtmp3+1
+          sta wtmp1+1
+
+rhs:      sec                           ; save greater of rhs to wtmp2
+          lda wtmp2
+          sbc wtmp4
+          lda wtmp2+1
+          sbc wtmp4+1
+          bpl bound
+
+          lda wtmp4
+          sta wtmp2
+          lda wtmp4+1
+          sta wtmp2+1
+
+bound:    lda wtmp2                     ; store bound witdh to wtmp4
+          sec
+          sbc wtmp1
+          sta wtmp4
+          lda wtmp2+1
+          sbc wtmp1+1
+          sta wtmp4+1
+
+          lda bullet_attrs+Bullet::w    ; store min width in wtmp3
+          clc
+          adc enemy_attrs+Enemy::w
+          sta wtmp3
+          lda #0
+          sta wtmp3+1
+
+          lda wtmp4
+          sec
+          sbc wtmp3
+          lda wtmp4+1
+          sbc wtmp3+1
+          ; continue if negative otherwise return
+
+          rts
+.endproc
+
           .rodata
           .byte 'r','o','d'
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
@@ -330,6 +447,11 @@ scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 
           .word SCREEN+10*40, SCREEN+11*40, SCREEN+12*40, SCREEN+13*40, SCREEN+14*40
           .word SCREEN+15*40, SCREEN+16*40, SCREEN+17*40, SCREEN+18*40, SCREEN+19*40
           .word SCREEN+20*40, SCREEN+21*40, SCREEN+22*40, SCREEN+23*40, SCREEN+24*40
+
+bullet_attrs:
+          .byte 0, 2, 8, 4
+enemy_attrs:
+          .byte 0, 1, 20, 18
 
           .bss
 bullets:  .tag Bullets
