@@ -184,7 +184,36 @@ no_hit:   lda #1              ; otherwise color white
 ;          bne l3
 
 update:   jsr update_bullets
+
+          ldx #0                        ; loop thru bullets and enemies
+l2:       ldy #0
+l3:
+          jsr bullet_hit                ; if hit, color enemy black and break
+          bpl next
+          stx tmp
+          ldx enemies+Enemies::id,y
+          lda #0
+          sta SPR_CO,x
+          ldx tmp
+
           jmp mloop
+
+next:     iny
+          cpy #8
+          bne l3
+          inx
+          cpx #8
+          bne l2
+
+          lda #1
+          ldx #0
+l4:       sta SPR_CO,x                  ; color all sprites white if no hits
+          inx
+          cpx #8
+          bne l4
+
+          jmp mloop
+
           .byte 'e','n','d'
 
 .proc     init_bullets
@@ -268,9 +297,9 @@ l1:       lda bullets+Bullets::flags,x
           lda #$20                      ; blank out prev on screen
           sta (scr_p),y
 
-          ;iny
-          ;cpy #40
-          ;beq disable
+          iny
+          cpy #40
+          beq disable
 
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
