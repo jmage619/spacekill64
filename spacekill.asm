@@ -7,6 +7,7 @@ SCREEN    = $0400
 SPR_P     = $07f8
 SCR_CO    = $d800
 RST_LN    = $d012
+VIC_CTL   = $d018
 INT_STA   = $d019
 BDR_CO    = $d020
 BKG_CO    = $d021
@@ -54,7 +55,35 @@ _x        .word 8
 _y        .word 8
 .endstruct
 
-          .code
+          .code; custom char set at $3000
+          lda #$ff            ; define tile at $01
+          sta $3008
+          sta $3009
+          sta $300a
+          sta $300b
+          sta $300c
+          sta $300d
+          sta $300e
+          sta $300f
+
+          lda #%00000000      ; define player bullet at $02
+          sta $3010
+          sta $3011
+          lda #%00111100
+          sta $3012
+          lda #%11111111
+          sta $3013
+          sta $3014
+          lda #%00111100
+          sta $3015
+          lda #%00000000
+          sta $3016
+          sta $3017
+
+          lda VIC_CTL         ; point to char set
+          and #$f0
+          ora #12
+          sta VIC_CTL
 
           lda #$0b            ; gray border
           sta BDR_CO          
@@ -65,7 +94,7 @@ _y        .word 8
           lda #$93            ; clear screen
           jsr CHROUT
 
-          lda #$a0
+          lda #$01
           sta SCREEN + 5 * 40 + 10
 
           lda #0
@@ -294,7 +323,7 @@ l1:       lda bullets+Bullets::flags,x
           sta scr_p + 1
 
           ldy bullets+Bullets::j,x
-          lda #$20                      ; blank out prev on screen
+          lda #$00                      ; blank out prev on screen
           sta (scr_p),y
 
           iny
@@ -303,7 +332,7 @@ l1:       lda bullets+Bullets::flags,x
 
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
-          lda #$a0
+          lda #$02
           sta (scr_p),y
 next:     inx
           cpx #8
