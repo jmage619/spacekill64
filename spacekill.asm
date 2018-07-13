@@ -66,19 +66,19 @@ _y        .word 8
           sta $300e
           sta $300f
 
-          lda #%00000000      ; define player bullet at $02
-          sta $3010
-          sta $3011
+          lda #%00000000      ; define player bullet at $80
+          sta $3400
+          sta $3401
           lda #%00111100
-          sta $3012
+          sta $3402
           lda #%11111111
-          sta $3013
-          sta $3014
+          sta $3403
+          sta $3404
           lda #%00111100
-          sta $3015
+          sta $3405
           lda #%00000000
-          sta $3016
-          sta $3017
+          sta $3406
+          sta $3407
 
           lda VIC_CTL         ; point to char set
           and #$f0
@@ -332,7 +332,7 @@ l1:       lda bullets+Bullets::flags,x
 
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
-          lda #$02
+          lda #$80
           sta (scr_p),y
 next:     inx
           cpx #8
