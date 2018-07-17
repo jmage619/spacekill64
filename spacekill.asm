@@ -19,15 +19,16 @@ SPR_MX    = $d010
 SPR_CLB   = $d01f
 
 speed     = 2
-x_chr     = $03
-y_chr     = $04
-flags     = $05
-tmp       = $06
-scr_p     = $07
-wtmp1     = $09
-wtmp2     = $0b
-wtmp3     = $0d
-wtmp4     = $0f
+_a        = $03
+x_chr     = $04
+y_chr     = $05
+flags     = $06
+tmp       = $07
+scr_p     = $08
+wtmp1     = $0a
+wtmp2     = $0c
+wtmp3     = $0e
+wtmp4     = $80
 
 .scope    Bullet
 dx        = 0
@@ -40,6 +41,24 @@ h         = 3
 flags     .byte 8
 i         .byte 8
 j         .byte 8
+.endstruct
+
+.scope    PAttrs
+dx        = 0
+dy        = 1
+w         = 2
+h         = 3
+.endscope
+
+.struct   Player
+id        .word
+sflag     .word
+_x        .word
+_y        .word
+bx1       .word
+bx2       .word
+by1       .word
+by2       .word
 .endstruct
 
 .scope    Enemy
@@ -101,17 +120,25 @@ _y        .word 8
           sta flags
           jsr init_input
 
-          lda #<(sprite / 64) ; define sprite
-          sta SPR_P
-          lda SPR_EN
-          ora #1
-          sta SPR_EN
-          lda #1
-          sta SPR_CO
+          ;lda #<(sprite / 64) ; define sprite
+          ;sta SPR_P
+          ;lda SPR_EN
+          ;ora #1
+          ;sta SPR_EN
+          ;lda #1
+          ;sta SPR_CO
+          ;lda #31
+          ;sta SPR_X
+          ;lda #57
+          ;sta SPR_Y
+
+          jsr init_player
           lda #31
-          sta SPR_X
+          sta player+Player::_x
           lda #57
-          sta SPR_Y
+          sta player+Player::_y
+
+          jsr update_player
 
           jsr init_enemies
 
@@ -141,46 +168,44 @@ l1:       cmp RST_LN
           lda #1<<1           ; check L
           bit INPUT
           beq check_R
-          lda SPR_X
+          lda player+Player::_x
           sec
           sbc #speed
-          sta SPR_X
-          bcs check_R         ; if borrow, clear upper bit of SPR_X
-
-          lda SPR_MX
-          and #<~1
-          sta SPR_MX
+          sta player+Player::_x
+          lda player+Player::_x+1
+          sbc #0
+          sta player+Player::_x+1
 
 check_R:  lda #1<<3
           bit INPUT
           beq check_U
-          lda SPR_X
+          lda player+Player::_x
           clc
           adc #speed
-          sta SPR_X
-          bcc check_U         ; if carry, set upper bit of SPR_X
-
-          lda SPR_MX
-          ora #1
-          sta SPR_MX
+          sta player+Player::_x
+          lda player+Player::_x+1
+          adc #0
+          sta player+Player::_x+1
 
 check_U:  lda #1
           bit INPUT
           beq check_D
-          lda SPR_Y
+          lda player+Player::_y
           sec
           sbc #speed
-          sta SPR_Y
+          sta player+Player::_y
 
 check_D:  lda #1<<2
           bit INPUT
-          beq check_K
-          lda SPR_Y
+          beq upd_pl
+          lda player+Player::_y
           clc
           adc #speed
-          sta SPR_Y
+          sta player+Player::_y
 
-check_K:  lda #1<<4           ; shoot if K pressed
+upd_pl:   jsr update_player
+
+          lda #1<<4           ; shoot if K pressed
           bit INPUT
           beq fire_off
 
@@ -245,6 +270,103 @@ l4:       sta SPR_CO,x                  ; color all sprites white if no hits
 
           .byte 'e','n','d'
 
+.proc     init_player
+          lda #0
+          sta player+Player::_x+1
+          sta player+Player::_y+1
+          lda #24
+          sta player+Player::_x
+          lda #50
+          sta player+Player::_y
+
+          ldy #0
+          lda #1
+l1:       bit SPR_EN                    ; search for first avail sprite
+          beq set
+          asl
+          iny
+          cpy #8
+          bne l1                        ; bail out if none found
+
+return:   rts
+
+set:      sta player+Player::sflag      ; save sprite flag
+          ora SPR_EN                    ; define player sprite
+          sta SPR_EN
+          tya
+          sta player+Player::id         ; save offset
+          lda #<(sprite / 64)
+          sta SPR_P,y
+          lda #1
+          sta SPR_CO,y
+
+          jmp return
+.endproc
+
+.proc     update_player
+          lda player+Player::_x         ; update bounding box x sides
+          clc
+          adc player_attrs+PAttrs::dx
+          sta player+Player::bx1
+          lda player+Player::_x+1
+          adc #0
+          sta player+Player::bx1+1
+
+          lda player_attrs+PAttrs::w    ; subtract 1 from w to get rhs
+          sta _a
+          dec _a
+
+          lda player+Player::bx1
+          clc
+          adc _a
+          sta player+Player::bx2
+          lda player+Player::bx1+1
+          adc #0
+          sta player+Player::bx2+1
+
+          lda player+Player::_y         ; update bounding box y sides
+          clc
+          adc player_attrs+PAttrs::dy
+          sta player+Player::by1
+          lda player+Player::_y+1
+          adc #0
+          sta player+Player::by1+1
+
+          lda player_attrs+PAttrs::h    ; subtract 1 from h to get bottom
+          sta _a
+          dec _a
+
+          lda player+Player::by1
+          clc
+          adc _a
+          sta player+Player::by2
+          lda player+Player::by1+1
+          adc #0
+          sta player+Player::by2+1
+
+          lda player+Player::id
+          asl
+          tax
+          lda player+Player::_x         ; update sprite x
+          sta SPR_X,x
+          lda player+Player::_x+1
+          beq clrx
+
+          lda SPR_MX
+          ora player+Player::sflag
+          sta SPR_MX
+          jmp sy
+
+clrx:     lda player+Player::sflag
+          eor #$ff
+          and SPR_MX
+          sta SPR_MX
+
+sy:       lda player+Player::_y         ; update sprite y
+          sta SPR_Y,x
+
+          rts
+.endproc
 .proc     init_bullets
           lda #0
           ldx #0
@@ -603,10 +725,13 @@ scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 
 
 bullet_attrs:
           .byte 0, 2, 8, 4
+player_attrs:
+          .byte 0,0,24,17
 enemy_attrs:
           .byte 0, 1, 20, 18
 
           .bss
+player:   .tag Player
 bullets:  .tag Bullets
 enemies:  .tag Enemies
 
