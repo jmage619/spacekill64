@@ -20,15 +20,17 @@ SPR_CLB   = $d01f
 
 speed     = 2
 _a        = $03
-x_chr     = $04
-y_chr     = $05
-flags     = $06
-tmp       = $07
-scr_p     = $08
-wtmp1     = $0a
-wtmp2     = $0c
-wtmp3     = $0e
-wtmp4     = $80
+_b        = $04
+_c        = $05
+x_chr     = $06
+y_chr     = $07
+flags     = $08
+tmp       = $09
+scr_p     = $0a
+wtmp1     = $0c
+wtmp2     = $0e
+wtmp3     = $10
+wtmp4     = $12
 
 .scope    Bullet
 dx        = 0
@@ -160,9 +162,24 @@ _y        .word 8
 mloop:    lda #$ff            ; wait until raster hit bottom border
 l1:       cmp RST_LN
           bne l1
-                              ; display should be updated first as much as possible
 
-          jsr read_input      ; get input
+          lda SPR_CLB                   ; test if player hit background
+          bit player+Player::sflag
+          beq input
+          jsr bkg_hit
+          beq no_hit
+
+          lda #2              ; color red if hit
+          ldx player+Player::id
+          sta SPR_CO,x
+          jmp input
+
+no_hit:   lda #1              ; otherwise color white
+          ldx player+Player::id
+          sta SPR_CO,x
+
+
+input:    jsr read_input      ; get input
 
                               ; update sprite pos
           lda #1<<1           ; check L
@@ -216,22 +233,23 @@ upd_pl:   jsr update_player
 fire_on:  lda flags           ; set pressed
           ora #1
           sta flags
-          jmp chk_hit
+          ;jmp chk_hit
+          jmp update
 
 fire_off: lda flags           ; clear pressed
           and #<~1
           sta flags
 
-chk_hit:  lda #1              ; check if sprite hit background
-          bit SPR_CLB
-          beq no_hit
-
-          lda #2              ; color red if hit
-          sta SPR_CO
-          jmp update
-
-no_hit:   lda #1              ; otherwise color white
-          sta SPR_CO
+;chk_hit:  lda #1              ; check if sprite hit background
+;          bit SPR_CLB
+;          beq no_hit
+;
+;          lda #2              ; color red if hit
+;          sta SPR_CO
+;          jmp update
+;
+;no_hit:   lda #1              ; otherwise color white
+;          sta SPR_CO
 
 ;burn:     ldx #13             ; enough cycles for raster to pass
 ;l3:       dex                 ; line $ff (63 cycles a line)
@@ -375,6 +393,93 @@ next:     sta bullets+Bullets::flags,x
           cpx #8
           bne next
           rts
+.endproc
+
+.proc     bkg_hit
+          lda player+Player::by1        ; first row
+          sec
+          sbc #50
+          sta wtmp1
+          lda player+Player::by1+1
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          lda wtmp1
+          ror
+          asl                           ; mult by 2 to get row offset (word sized)
+          sta _a
+
+          lda player+Player::by2        ; last row
+          sec
+          sbc #50
+          sta wtmp1
+          lda player+Player::by2+1
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          lda wtmp1
+          ror
+          asl                           ; mult by 2 to get row offset (word sized)
+          tax
+
+          lda player+Player::bx1        ; first col
+          sec
+          sbc #24
+          sta wtmp1
+          lda player+Player::bx1+1
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+
+          lda wtmp1
+          sta _b
+
+          lda player+Player::bx2        ; last col
+          sec
+          sbc #24
+          sta wtmp1
+          lda player+Player::bx2+1
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+
+          lda wtmp1
+          sta _c
+
+l1:       lda scr_rt,x
+          sta scr_p
+          lda scr_rt+1,x
+          sta scr_p+1
+
+          ldy _c
+l2:       lda (scr_p),y
+          cmp #$20                       ; keep going if space
+          bne return
+          dey
+          cpy _b
+          bpl l2
+
+          dex
+          dex
+          cpx _a
+          bpl l1
+
+          lda #0                        ; if not found set zero flag
+return:   rts
 .endproc
 
 .proc     create_bullet
