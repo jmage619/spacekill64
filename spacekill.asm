@@ -113,8 +113,7 @@ _y        .word 8
           lda #$00            ; black background
           sta BKG_CO
 
-          lda #$93            ; clear screen
-          jsr CHROUT
+          jsr clr_screen      ; clear screen
 
           lda #$01
           sta SCREEN + 5 * 40 + 10
@@ -289,6 +288,26 @@ l4:       sta SPR_CO,x                  ; color all sprites white if no hits
           jmp mloop
 
           .byte 'e','n','d'
+
+.proc     clr_screen
+          ldx #48
+l1:       lda scr_rt,x
+          sta scr_p
+          lda scr_rt+1,x
+          sta scr_p+1
+
+          lda #0
+          ldy #39
+l2:       sta (scr_p),y
+          dey
+          bpl l2
+
+          dex
+          dex
+          bpl l1
+
+          rts
+.endproc
 
 .proc     init_player
           lda #0
@@ -471,6 +490,7 @@ l1:       lda scr_rt,x
 
           ldy _c
 l2:       lda (scr_p),y
+          beq next                      ; skip to next tile if empty
           and #$80                      ; bkg tile hit?
           bne test_pb
           lda _d
