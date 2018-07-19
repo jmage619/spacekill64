@@ -563,7 +563,7 @@ lo:       lda SPR_X
           lsr
 
           clc
-          adc #3              ; correct x pos rel to sprite
+          adc #2              ; correct x pos rel to sprite
           sta bullets+Bullets::j,x
 
           lda SPR_Y           ; get y
