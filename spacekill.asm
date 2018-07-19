@@ -22,15 +22,16 @@ speed     = 2
 _a        = $03
 _b        = $04
 _c        = $05
-x_chr     = $06
-y_chr     = $07
-flags     = $08
-tmp       = $09
-scr_p     = $0a
-wtmp1     = $0c
-wtmp2     = $0e
-wtmp3     = $10
-wtmp4     = $12
+_d        = $06
+x_chr     = $07
+y_chr     = $08
+flags     = $09
+tmp       = $0a
+scr_p     = $0b
+wtmp1     = $0d
+wtmp2     = $0f
+wtmp3     = $11
+wtmp4     = $13
 
 .scope    Bullet
 dx        = 0
@@ -167,6 +168,7 @@ l1:       cmp RST_LN
           bit player+Player::sflag
           beq input
           jsr bkg_hit
+          and #1
           beq no_hit
 
           lda #2              ; color red if hit
@@ -396,6 +398,8 @@ next:     sta bullets+Bullets::flags,x
 .endproc
 
 .proc     bkg_hit
+          lda #0
+          sta _d
           lda player+Player::by1        ; first row
           sec
           sbc #50
@@ -467,9 +471,29 @@ l1:       lda scr_rt,x
 
           ldy _c
 l2:       lda (scr_p),y
-          cmp #$20                       ; keep going if space
-          bne return
-          dey
+          and #$80                      ; bkg tile hit?
+          bne test_pb
+          lda _d
+          ora #1
+          sta _d
+
+test_pb:  lda (scr_p),y                 ; player bullet hit?
+          and #$f0
+          cmp #$80
+          bne test_eb
+          lda _d
+          ora #1<<1
+          sta _d
+
+test_eb:  lda (scr_p),y                 ; enemy bullet hit?
+          and #$f0
+          cmp #$90
+          bne next
+          lda _d
+          ora #1<<2
+          sta _d
+
+next:     dey
           cpy _b
           bpl l2
 
@@ -478,8 +502,8 @@ l2:       lda (scr_p),y
           cpx _a
           bpl l1
 
-          lda #0                        ; if not found set zero flag
-return:   rts
+          lda _d
+          rts
 .endproc
 
 .proc     create_bullet
