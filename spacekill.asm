@@ -165,7 +165,7 @@ l1:       cmp RST_LN
 
           lda SPR_CLB                   ; test if player hit background
           bit player+Player::sflag
-          beq input
+          beq no_hit
           jsr bkg_hit
           and #1
           beq no_hit
@@ -258,33 +258,33 @@ fire_off: lda flags           ; clear pressed
 
 update:   jsr update_bullets
 
-          ldx #0                        ; loop thru bullets and enemies
-l2:       ldy #0
-l3:
-          jsr bullet_hit                ; if hit, color enemy black and break
-          bpl next
-          stx tmp
-          ldx enemies+Enemies::id,y
-          lda #0
-          sta SPR_CO,x
-          ldx tmp
-
-          jmp mloop
-
-next:     iny
-          cpy #8
-          bne l3
-          inx
-          cpx #8
-          bne l2
-
-          lda #1
-          ldx #0
-l4:       sta SPR_CO,x                  ; color all sprites white if no hits
-          inx
-          cpx #8
-          bne l4
-
+;          ldx #0                        ; loop thru bullets and enemies
+;l2:       ldy #0
+;l3:
+;          jsr bullet_hit                ; if hit, color enemy black and break
+;          bpl next
+;          stx tmp
+;          ldx enemies+Enemies::id,y
+;          lda #0
+;          sta SPR_CO,x
+;          ldx tmp
+;
+;          jmp mloop
+;
+;next:     iny
+;          cpy #8
+;          bne l3
+;          inx
+;          cpx #8
+;          bne l2
+;
+;          lda #1
+;          ldx #0
+;l4:       sta SPR_CO,x                  ; color all sprites white if no hits
+;          inx
+;          cpx #8
+;          bne l4
+;
           jmp mloop
 
           .byte 'e','n','d'
