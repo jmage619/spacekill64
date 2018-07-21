@@ -163,6 +163,8 @@ mloop:    lda #$ff            ; wait until raster hit bottom border
 l1:       cmp RST_LN
           bne l1
 
+          jsr read_input      ; get input
+
           lda SPR_CLB                   ; test if player hit background
           bit player+Player::sflag
           beq no_hit
@@ -179,10 +181,7 @@ no_hit:   lda #1              ; otherwise color white
           ldx player+Player::id
           sta SPR_CO,x
 
-
-input:    jsr read_input      ; get input
-
-                              ; update sprite pos
+input:                        ; handle user input
           lda #1<<1           ; check L
           bit INPUT
           beq check_R
