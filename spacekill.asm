@@ -160,6 +160,7 @@ by2       .word 8
 
           ldx #0
           jsr create_enemy
+          jsr update_enemies
 
           jsr init_bullets
 
@@ -645,7 +646,7 @@ l1:       bit SPR_EN                    ; search for first avail sprite
 
 return:   rts
 
-set:      sta tmp                       ; save sprite flag for max x bit
+set:      sta enemies+Enemies::sflag,x  ; save sprite flag
           ora SPR_EN                    ; define enemy sprite
           sta SPR_EN
           tya
@@ -654,23 +655,8 @@ set:      sta tmp                       ; save sprite flag for max x bit
           sta SPR_P,y
           lda #1
           sta SPR_CO,y
-          tya                           ; sprite x,y are in pairs so
-          asl                           ; multiply by 2 for correct offsets
-          tay
-          lda enemies+Enemies::_x,x
-          sta SPR_X,y
-          lda enemies+Enemies::_x+1,x
-          beq get_y                     ; test if sprite max x bit should be set
-
-          lda SPR_MX
-          ora tmp
-          sta SPR_MX
-
-get_y:    lda enemies+Enemies::_y,x
-          sta SPR_Y,y
 
           jmp return
-
 .endproc
 
 .proc     update_enemies
