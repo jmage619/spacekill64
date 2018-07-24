@@ -64,7 +64,7 @@ by1       .word
 by2       .word
 .endstruct
 
-.scope    Enemy
+.scope    EAttrs
 dx        = 0
 dy        = 1
 w         = 2
@@ -73,8 +73,13 @@ h         = 3
 
 .struct   Enemies
 id        .word 8
+sflag     .word 8
 _x        .word 8
 _y        .word 8
+bx1       .word 8
+bx2       .word 8
+by1       .word 8
+by2       .word 8
 .endstruct
 
           .code; custom char set at $3000
@@ -668,6 +673,85 @@ get_y:    lda enemies+Enemies::_y,x
 
 .endproc
 
+.proc     update_enemies
+          ldy #14
+l1:       lda enemies+Enemies::id
+          bne update
+          dey
+          dey
+          bpl l1
+
+          jmp return
+
+update:   lda enemies+Enemies::_x,y         ; update bounding box x sides
+          clc
+          adc enemy_attrs+EAttrs::dx
+          sta enemies+Enemies::bx1,y
+          lda enemies+Enemies::_x+1,y
+          adc #0
+          sta enemies+Enemies::bx1+1,y
+
+          lda enemy_attrs+EAttrs::w    ; subtract 1 from w to get rhs
+          sta _a
+          dec _a
+
+          lda enemies+Enemies::bx1,y
+          clc
+          adc _a
+          sta enemies+Enemies::bx2,y
+          lda enemies+Enemies::bx1+1,y
+          adc #0
+          sta enemies+Enemies::bx2+1,y
+
+          lda enemies+Enemies::_y,y      ; update bounding box y sides
+          clc
+          adc enemy_attrs+EAttrs::dy
+          sta enemies+Enemies::by1,y
+          lda enemies+Enemies::_y+1,y
+          adc #0
+          sta enemies+Enemies::by1+1,y
+
+          lda enemy_attrs+EAttrs::h    ; subtract 1 from h to get bottom
+          sta _a
+          dec _a
+
+          lda enemies+Enemies::by1,y
+          clc
+          adc _a
+          sta enemies+Enemies::by2,y
+          lda enemies+Enemies::by1+1,y
+          adc #0
+          sta enemies+Enemies::by2+1,y
+
+          lda enemies+Enemies::id,y
+          asl
+          tax
+          lda enemies+Enemies::_x,y         ; update sprite x
+          sta SPR_X,x
+          lda enemies+Enemies::_x+1,y
+          beq clrx
+
+          lda SPR_MX
+          ora enemies+Enemies::sflag,y
+          sta SPR_MX
+          jmp sy
+
+clrx:     lda enemies+Enemies::sflag,y
+          eor #$ff
+          and SPR_MX
+          sta SPR_MX
+
+sy:       lda enemies+Enemies::_y,y         ; update sprite y
+          sta SPR_Y,x
+
+          dey
+          dey
+          bmi return
+          jmp l1
+
+return:   rts
+.endproc
+
           .byte 'h','i','t'
 .proc     bullet_hit
           lda #0
@@ -705,7 +789,7 @@ get_y:    lda enemies+Enemies::_y,x
 
           lda enemies+Enemies::_x,y     ; get enemy x and add dx
           clc
-          adc enemy_attrs+Enemy::dx
+          adc enemy_attrs+EAttrs::dx
           sta wtmp3
           lda enemies+Enemies::_x+1,y
           adc #0
@@ -713,7 +797,7 @@ get_y:    lda enemies+Enemies::_y,x
 
           lda wtmp3                     ; save rhs
           clc
-          adc enemy_attrs+Enemy::w
+          adc enemy_attrs+EAttrs::w
           sta wtmp4
           lda wtmp3+1
           adc #0
@@ -753,7 +837,7 @@ bound_x:  lda wtmp2                     ; store bound witdh to wtmp4
 
           lda bullet_attrs+Bullet::w    ; store min width in wtmp3
           clc
-          adc enemy_attrs+Enemy::w
+          adc enemy_attrs+EAttrs::w
           sta wtmp3
           lda #0
           sta wtmp3+1
@@ -801,7 +885,7 @@ test_y:   lda #0
 
           lda enemies+Enemies::_y,y     ; get enemy y and add dy
           clc
-          adc enemy_attrs+Enemy::dy
+          adc enemy_attrs+EAttrs::dy
           sta wtmp3
           lda enemies+Enemies::_y+1,y
           adc #0
@@ -809,7 +893,7 @@ test_y:   lda #0
 
           lda wtmp3                     ; save bottom
           clc
-          adc enemy_attrs+Enemy::h
+          adc enemy_attrs+EAttrs::h
           sta wtmp4
           lda wtmp3+1
           adc #0
@@ -849,7 +933,7 @@ bound_y:  lda wtmp2                     ; store bound height to wtmp4
 
           lda bullet_attrs+Bullet::h    ; store min height in wtmp3
           clc
-          adc enemy_attrs+Enemy::h
+          adc enemy_attrs+EAttrs::h
           sta wtmp3
           lda #0
           sta wtmp3+1
