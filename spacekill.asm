@@ -129,18 +129,6 @@ by2       .word 8
           sta flags
           jsr init_input
 
-          ;lda #<(sprite / 64) ; define sprite
-          ;sta SPR_P
-          ;lda SPR_EN
-          ;ora #1
-          ;sta SPR_EN
-          ;lda #1
-          ;sta SPR_CO
-          ;lda #31
-          ;sta SPR_X
-          ;lda #57
-          ;sta SPR_Y
-
           jsr init_player
           lda #31
           sta player+Player::_x
@@ -266,60 +254,15 @@ upd_pl:   jsr update_player
 fire_on:  lda flags           ; set pressed
           ora #1
           sta flags
-          ;jmp chk_hit
           jmp update
 
 fire_off: lda flags           ; clear pressed
           and #<~1
           sta flags
 
-;chk_hit:  lda #1              ; check if sprite hit background
-;          bit SPR_CLB
-;          beq no_hit
-;
-;          lda #2              ; color red if hit
-;          sta SPR_CO
-;          jmp update
-;
-;no_hit:   lda #1              ; otherwise color white
-;          sta SPR_CO
-
-;burn:     ldx #13             ; enough cycles for raster to pass
-;l3:       dex                 ; line $ff (63 cycles a line)
-;          bne l3
-
 update:   jsr update_bullets
 
-;          ldx #0                        ; loop thru bullets and enemies
-;l2:       ldy #0
-;l3:
-;          jsr bullet_hit                ; if hit, color enemy black and break
-;          bpl next
-;          stx tmp
-;          ldx enemies+Enemies::id,y
-;          lda #0
-;          sta SPR_CO,x
-;          ldx tmp
-;
-;          jmp mloop
-;
-;next:     iny
-;          cpy #8
-;          bne l3
-;          inx
-;          cpx #8
-;          bne l2
-;
-;          lda #1
-;          ldx #0
-;l4:       sta SPR_CO,x                  ; color all sprites white if no hits
-;          inx
-;          cpx #8
-;          bne l4
-;
           jmp mloop
-
-          .byte 'e','n','d'
 
 .proc     clr_screen
           ldx #48
@@ -611,7 +554,6 @@ lo:       lda SPR_X
 return:   rts
 .endproc
 
-.byte     'u','d','b'
 .proc     update_bullets
           ldx #0
 l1:       lda bullets+Bullets::flags,x
@@ -871,203 +813,7 @@ next:     dey
           rts
 .endproc
 
-          .byte 'h','i','t'
-.proc     bullet_hit
-          lda #0
-          sta wtmp1+1
-          lda bullets+Bullets::j,x
-          asl                           ; mult by 8 to translate to px
-          rol wtmp1+1
-          asl
-          rol wtmp1+1
-          asl
-          rol wtmp1+1
-
-          clc                           ; x border compensation
-          adc #24
-          sta wtmp1
-          lda wtmp1+1
-          adc #0
-          sta wtmp1+1
-
-          lda wtmp1                     ; add dx
-          clc
-          adc bullet_attrs+Bullet::dx
-          sta wtmp1
-          lda wtmp1+1
-          adc #0
-          sta wtmp1+1
-
-          lda wtmp1                     ; save rhs
-          clc
-          adc bullet_attrs+Bullet::w
-          sta wtmp2
-          lda wtmp1+1
-          adc #0
-          sta wtmp2+1
-
-          lda enemies+Enemies::_x,y     ; get enemy x and add dx
-          clc
-          adc enemy_attrs+EAttrs::dx
-          sta wtmp3
-          lda enemies+Enemies::_x+1,y
-          adc #0
-          sta wtmp3+1
-
-          lda wtmp3                     ; save rhs
-          clc
-          adc enemy_attrs+EAttrs::w
-          sta wtmp4
-          lda wtmp3+1
-          adc #0
-          sta wtmp4+1
-
-          sec                           ; save lower of lhs to wtmp1
-          lda wtmp3
-          sbc wtmp1
-          lda wtmp3+1
-          sbc wtmp1+1
-          bpl rhs
-
-          lda wtmp3
-          sta wtmp1
-          lda wtmp3+1
-          sta wtmp1+1
-
-rhs:      sec                           ; save greater of rhs to wtmp2
-          lda wtmp2
-          sbc wtmp4
-          lda wtmp2+1
-          sbc wtmp4+1
-          bpl bound_x
-
-          lda wtmp4
-          sta wtmp2
-          lda wtmp4+1
-          sta wtmp2+1
-
-bound_x:  lda wtmp2                     ; store bound witdh to wtmp4
-          sec
-          sbc wtmp1
-          sta wtmp4
-          lda wtmp2+1
-          sbc wtmp1+1
-          sta wtmp4+1
-
-          lda bullet_attrs+Bullet::w    ; store min width in wtmp3
-          clc
-          adc enemy_attrs+EAttrs::w
-          sta wtmp3
-          lda #0
-          sta wtmp3+1
-
-          lda wtmp4
-          sec
-          sbc wtmp3
-          lda wtmp4+1
-          sbc wtmp3+1
-          bmi test_y                    ; continue if negative otherwise return
-          rts
-
-test_y:   lda #0
-          sta wtmp1+1
-          lda bullets+Bullets::i,x
-          asl                           ; mult by 8 to translate to px
-          rol wtmp1+1
-          asl
-          rol wtmp1+1
-          asl
-          rol wtmp1+1
-
-          clc                           ; y border compensation
-          adc #50
-          sta wtmp1
-          lda wtmp1+1
-          adc #0
-          sta wtmp1+1
-
-          lda wtmp1                     ; add dy
-          clc
-          adc bullet_attrs+Bullet::dy
-          sta wtmp1
-          lda wtmp1+1
-          adc #0
-          sta wtmp1+1
-
-          lda wtmp1                     ; save bottom
-          clc
-          adc bullet_attrs+Bullet::h
-          sta wtmp2
-          lda wtmp1+1
-          adc #0
-          sta wtmp2+1
-
-          lda enemies+Enemies::_y,y     ; get enemy y and add dy
-          clc
-          adc enemy_attrs+EAttrs::dy
-          sta wtmp3
-          lda enemies+Enemies::_y+1,y
-          adc #0
-          sta wtmp3+1
-
-          lda wtmp3                     ; save bottom
-          clc
-          adc enemy_attrs+EAttrs::h
-          sta wtmp4
-          lda wtmp3+1
-          adc #0
-          sta wtmp4+1
-
-          sec                           ; save lower of top to wtmp1
-          lda wtmp3
-          sbc wtmp1
-          lda wtmp3+1
-          sbc wtmp1+1
-          bpl top
-
-          lda wtmp3
-          sta wtmp1
-          lda wtmp3+1
-          sta wtmp1+1
-
-top:      sec                           ; save greater of top to wtmp2
-          lda wtmp2
-          sbc wtmp4
-          lda wtmp2+1
-          sbc wtmp4+1
-          bpl bound_y
-
-          lda wtmp4
-          sta wtmp2
-          lda wtmp4+1
-          sta wtmp2+1
-
-bound_y:  lda wtmp2                     ; store bound height to wtmp4
-          sec
-          sbc wtmp1
-          sta wtmp4
-          lda wtmp2+1
-          sbc wtmp1+1
-          sta wtmp4+1
-
-          lda bullet_attrs+Bullet::h    ; store min height in wtmp3
-          clc
-          adc enemy_attrs+EAttrs::h
-          sta wtmp3
-          lda #0
-          sta wtmp3+1
-
-          lda wtmp4
-          sec
-          sbc wtmp3
-          lda wtmp4+1
-          sbc wtmp3+1
-
-          rts
-.endproc
-
           .rodata
-          .byte 'r','o','d'
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
           .word SCREEN+ 5*40, SCREEN+ 6*40, SCREEN+ 7*40, SCREEN+ 8*40, SCREEN +9*40
           .word SCREEN+10*40, SCREEN+11*40, SCREEN+12*40, SCREEN+13*40, SCREEN+14*40
