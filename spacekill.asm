@@ -23,15 +23,17 @@ _a        = $03
 _b        = $04
 _c        = $05
 _d        = $06
-x_chr     = $07
-y_chr     = $08
-flags     = $09
-tmp       = $0a
-scr_p     = $0b
-wtmp1     = $0d
-wtmp2     = $0f
-wtmp3     = $11
-wtmp4     = $13
+_e        = $07
+_f        = $08
+x_chr     = $09
+y_chr     = $0a
+flags     = $0b
+tmp       = $0c
+scr_p     = $0d
+wtmp1     = $0f
+wtmp2     = $11
+wtmp3     = $13
+wtmp4     = $15
 
 .scope    Bullet
 dx        = 0
@@ -172,6 +174,7 @@ l1:       cmp RST_LN
           jsr read_input      ; get input
 
           lda SPR_CLB                   ; test if player hit background
+          sta tmp                       ; store bkg collision for enemy tests
           bit player+Player::sflag
           beq no_hit
           jsr bkg_hit
@@ -181,11 +184,35 @@ l1:       cmp RST_LN
           lda #2              ; color red if hit
           ldx player+Player::id
           sta SPR_CO,x
-          jmp input
+          jmp echk
 
 no_hit:   lda #1              ; otherwise color white
           ldx player+Player::id
           sta SPR_CO,x
+
+echk:     ldx #14                       ; loop through enemies to find a hit
+l2:       lda enemies+Enemies::id,x
+          beq n2
+
+          lda tmp
+          and enemies+Enemies::sflag,x
+          beq eno_hit
+          jsr ebkg_hit
+          and #1<<1
+          beq eno_hit
+
+          lda #2
+          ldy enemies+Enemies::id,x
+          sta SPR_CO,y
+          jmp n2
+
+eno_hit:  lda #1
+          ldy enemies+Enemies::id,x
+          sta SPR_CO,y
+
+n2:       dex
+          dex
+          bpl l2
 
 input:                        ; handle user input
           lda #1<<1           ; check L
@@ -736,6 +763,112 @@ sy:       lda enemies+Enemies::_y,y         ; update sprite y
           jmp l1
 
 return:   rts
+.endproc
+
+; input enemy index in x reg
+.proc     ebkg_hit
+          lda #0
+          sta _e
+          lda enemies+Enemies::by1,x      ; first row
+          sec
+          sbc #50
+          sta wtmp1
+          lda enemies+Enemies::by1+1,x
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          lda wtmp1
+          ror
+          asl                           ; mult by 2 to get row offset (word sized)
+          sta _a
+
+          lda enemies+Enemies::by2,x    ; last row
+          sec
+          sbc #50
+          sta wtmp1
+          lda enemies+Enemies::by2+1,x
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          lda wtmp1
+          ror
+          asl                           ; mult by 2 to get row offset (word sized)
+          sta _b
+
+          lda enemies+Enemies::bx1,x    ; first col
+          sec
+          sbc #24
+          sta wtmp1
+          lda enemies+Enemies::bx1+1,x
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+
+          lda wtmp1
+          sta _c
+
+          lda enemies+Enemies::bx2,x    ; last col
+          sec
+          sbc #24
+          sta wtmp1
+          lda enemies+Enemies::bx2+1,x
+          sbc #0
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+          lsr
+          ror wtmp1
+
+          lda wtmp1
+          sta _d
+
+          stx _f
+          ldx _b
+l1:       lda scr_rt,x
+          sta scr_p
+          lda scr_rt+1,x
+          sta scr_p+1
+
+          ldy _d
+l2:       lda (scr_p),y
+          beq next                      ; skip to next tile if empty
+          and #$80                      ; bkg tile hit?
+          bne test_pb
+          lda _e
+          ora #1
+          sta _e
+
+test_pb:  lda (scr_p),y                 ; player bullet hit?
+          and #$f0
+          cmp #$80
+          bne next
+          lda _e
+          ora #1<<1
+          sta _e
+
+next:     dey
+          cpy _c
+          bpl l2
+
+          dex
+          dex
+          cpx _a
+          bpl l1
+
+          lda _e
+          ldx _f
+          rts
 .endproc
 
           .byte 'h','i','t'
