@@ -192,7 +192,7 @@ no_hit:   lda #1              ; otherwise color white
 
 echk:     ldx #14                       ; loop through enemies to find a hit
 l2:       lda enemies+Enemies::id,x
-          beq n2
+          bmi n2
 
           lda tmp
           and enemies+Enemies::sflag,x
@@ -689,7 +689,7 @@ set:      sta enemies+Enemies::sflag,x  ; save sprite flag
 .proc     update_enemies
           ldy #14
 l1:       lda enemies+Enemies::id
-          bne update
+          bpl update
           dey
           dey
           bpl l1
