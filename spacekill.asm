@@ -630,7 +630,7 @@ set:      sta enemies+Enemies::sflag,x  ; save sprite flag
 
 .proc     update_enemies
           ldy #14
-l1:       lda enemies+Enemies::id
+l1:       lda enemies+Enemies::id,y
           bpl update
           dey
           dey
