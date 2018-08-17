@@ -84,34 +84,34 @@ by1       .word 8
 by2       .word 8
 .endstruct
 
-          .code; custom char set at $3000
+          .code; custom char set at $3800
           lda #$ff            ; define tile at $01
-          sta $3008
-          sta $3009
-          sta $300a
-          sta $300b
-          sta $300c
-          sta $300d
-          sta $300e
-          sta $300f
+          sta $3808
+          sta $3809
+          sta $380a
+          sta $380b
+          sta $380c
+          sta $380d
+          sta $380e
+          sta $380f
 
           lda #%00000000      ; define player bullet at $80
-          sta $3400
-          sta $3401
+          sta $3c00
+          sta $3c01
           lda #%00111100
-          sta $3402
+          sta $3c02
           lda #%11111111
-          sta $3403
-          sta $3404
+          sta $3c03
+          sta $3c04
           lda #%00111100
-          sta $3405
+          sta $3c05
           lda #%00000000
-          sta $3406
-          sta $3407
+          sta $3c06
+          sta $3c07
 
           lda VIC_CTL         ; point to char set
           and #$f0
-          ora #12
+          ora #14
           sta VIC_CTL
 
           lda #$0b            ; gray border
