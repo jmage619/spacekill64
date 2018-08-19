@@ -1,10 +1,11 @@
           .include "input.inc"
           .include "zeropage.inc"
 
-CHROUT    = $ffd2
-
 SCREEN    = $0400
 SPR_P     = $07f8
+
+CHARS     = $3800
+
 SCR_CO    = $d800
 RST_LN    = $d012
 VIC_CTL   = $d018
@@ -17,6 +18,11 @@ SPR_X     = $d000
 SPR_Y     = $d001
 SPR_MX    = $d010
 SPR_CLB   = $d01f
+
+SETLFS    = $ffba
+SETNAM    = $ffbd
+CHROUT    = $ffd2
+LOAD      = $ffd5
 
 speed     = 2
 _a        = $03
@@ -85,29 +91,18 @@ by2       .word 8
 .endstruct
 
           .code; custom char set at $3800
-          ;lda #$ff            ; define tile at $01
-          ;sta $3808
-          ;sta $3809
-          ;sta $380a
-          ;sta $380b
-          ;sta $380c
-          ;sta $380d
-          ;sta $380e
-          ;sta $380f
-
-          ;lda #%00000000      ; define player bullet at $80
-          ;sta $3c00
-          ;sta $3c01
-          ;lda #%00111100
-          ;sta $3c02
-          ;lda #%11111111
-          ;sta $3c03
-          ;sta $3c04
-          ;lda #%00111100
-          ;sta $3c05
-          ;lda #%00000000
-          ;sta $3c06
-          ;sta $3c07
+          lda #5
+          ldx #<chr_fname
+          ldy #>chr_fname
+          jsr SETNAM
+          lda #1
+          ldx #8
+          ldy #0
+          jsr SETLFS
+          ldx #<CHARS
+          ldy #>CHARS
+          lda #0
+          jsr LOAD
 
           lda VIC_CTL         ; point to char set
           and #$f0
@@ -814,6 +809,8 @@ next:     dey
 .endproc
 
           .rodata
+chr_fname:
+          .byte "chars"
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
           .word SCREEN+ 5*40, SCREEN+ 6*40, SCREEN+ 7*40, SCREEN+ 8*40, SCREEN +9*40
           .word SCREEN+10*40, SCREEN+11*40, SCREEN+12*40, SCREEN+13*40, SCREEN+14*40
@@ -877,18 +874,3 @@ sprite2:  .byte %00000011, %11111110, %00000000
           .byte %00011111, %11111111, %11000000
           .byte %00001111, %11111111, %00000000
           .byte %00000011, %11111000, %00000000
-
-          .segment "ASSETS"
-chars:    .byte 0,0,0,0,0,0,0,0                   ; empty tile at $00
-          .byte $ff,$ff,$ff,$ff,$ff,$ff,$ff,$ff   ; define tile at $01
-
-          .res $400-2*8
-
-          .byte %00000000               ; define player bullet at $80
-          .byte %00000000
-          .byte %00111100
-          .byte %11111111
-          .byte %11111111
-          .byte %00111100
-          .byte %00000000
-          .byte %00000000
