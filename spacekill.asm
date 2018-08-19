@@ -1,28 +1,11 @@
           .include "input.inc"
           .include "zeropage.inc"
-
-SCREEN    = $0400
-SPR_P     = $07f8
+          .include "sys.inc"
+          .include "screen.inc"
+          .include "sprites.inc"
+          .include "player.inc"
 
 CHARS     = $3800
-
-SCR_CO    = $d800
-RST_LN    = $d012
-VIC_CTL   = $d018
-INT_STA   = $d019
-BDR_CO    = $d020
-BKG_CO    = $d021
-SPR_EN    = $d015
-SPR_CO    = $d027
-SPR_X     = $d000
-SPR_Y     = $d001
-SPR_MX    = $d010
-SPR_CLB   = $d01f
-
-SETLFS    = $ffba
-SETNAM    = $ffbd
-CHROUT    = $ffd2
-LOAD      = $ffd5
 
 speed     = 2
 _a        = $03
@@ -52,24 +35,6 @@ h         = 3
 flags     .byte 8
 i         .byte 8
 j         .byte 8
-.endstruct
-
-.scope    PAttrs
-dx        = 0
-dy        = 1
-w         = 2
-h         = 3
-.endscope
-
-.struct   Player
-id        .word
-sflag     .word
-_x        .word
-_y        .word
-bx1       .word
-bx2       .word
-by1       .word
-by2       .word
 .endstruct
 
 .scope    EAttrs
@@ -277,39 +242,6 @@ l2:       sta (scr_p),y
           bpl l1
 
           rts
-.endproc
-
-.proc     init_player
-          lda #0
-          sta player+Player::_x+1
-          sta player+Player::_y+1
-          lda #24
-          sta player+Player::_x
-          lda #50
-          sta player+Player::_y
-
-          ldy #0
-          lda #1
-l1:       bit SPR_EN                    ; search for first avail sprite
-          beq set
-          asl
-          iny
-          cpy #8
-          bne l1                        ; bail out if none found
-
-return:   rts
-
-set:      sta player+Player::sflag      ; save sprite flag
-          ora SPR_EN                    ; define player sprite
-          sta SPR_EN
-          tya
-          sta player+Player::id         ; save offset
-          lda #<(sprite / 64)
-          sta SPR_P,y
-          lda #1
-          sta SPR_CO,y
-
-          jmp return
 .endproc
 
 .proc     update_player
@@ -819,58 +751,9 @@ scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 
 
 bullet_attrs:
           .byte 0, 2, 8, 4
-player_attrs:
-          .byte 0,0,24,17
 enemy_attrs:
           .byte 0, 1, 20, 18
 
           .bss
-player:   .tag Player
 bullets:  .tag Bullets
 enemies:  .tag Enemies
-
-          .segment "SPRITES"
-sprite:   .byte %00011000, %00000000, %00000000
-          .byte %00011111, %11000000, %00000000
-          .byte %00010011, %10110000, %00000000
-          .byte %00010011, %10001100, %00000000
-          .byte %00110011, %10000011, %00000000
-          .byte %00110011, %11000000, %11000000
-          .byte %01110011, %11100000, %00110000
-          .byte %11110011, %11111111, %11111100
-          .byte %11110000, %11111111, %11111111
-          .byte %11110000, %00111111, %11111110
-          .byte %01110000, %00010101, %01010100
-          .byte %00110000, %00101010, %10101000
-          .byte %00110000, %01010101, %00010000
-          .byte %00010000, %00000000, %11100000
-          .byte %00010000, %11111111, %00000000
-          .byte %00010001, %00000000, %00000000
-          .byte %00011110, %00000000, %00000000
-          .byte %00000000, %00000000, %00000000
-          .byte %00000000, %00000000, %00000000
-          .byte %00000000, %00000000, %00000000
-          .byte %00000000, %00000000, %00000000
-
-.align    $40
-sprite2:  .byte %00000011, %11111110, %00000000
-          .byte %00001111, %11111111, %10000000
-          .byte %00011111, %11111111, %11000000
-          .byte %00111111, %00111111, %11100000
-          .byte %01111100, %00111111, %11110000
-          .byte %01111000, %00111111, %11110000
-          .byte %11110000, %01111111, %11110000
-          .byte %11110000, %11111111, %11110000
-          .byte %11111111, %11111111, %11110000
-          .byte %11111111, %11111111, %11110000
-          .byte %01111111, %11111111, %11110000
-          .byte %00000000, %11111111, %11110000
-          .byte %00000000, %11111111, %11110000
-          .byte %01000000, %11111111, %11110000
-          .byte %01100000, %11111111, %11110000
-          .byte %01111111, %11111111, %11110000
-          .byte %01111111, %11111111, %11110000
-          .byte %00111111, %11111111, %11100000
-          .byte %00011111, %11111111, %11000000
-          .byte %00001111, %11111111, %00000000
-          .byte %00000011, %11111000, %00000000
