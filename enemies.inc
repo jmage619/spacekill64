@@ -16,5 +16,9 @@ by1       .word 8
 by2       .word 8
 .endstruct
 
+          .global init_enemies
+          .global create_enemy
+          .global update_enemies
+          .global ebkg_hit
           .global enemy_attrs
           .global enemies

@@ -15,10 +15,10 @@ chars: chars.asm
 bullets.o: bullets.asm bullets.inc screen.inc zeropage.inc sys.inc
 	cl65 -c -t c64 -o $@ $<
 
-enemies.o: enemies.asm enemies.inc# screen.inc zeropage.inc sys.inc
+enemies.o: enemies.asm enemies.inc screen.inc sprites.inc zeropage.inc sys.inc
 	cl65 -c -t c64 -o $@ $<
 
-player.o: player.asm player.inc screen.inc zeropage.inc sys.inc
+player.o: player.asm player.inc screen.inc sprites.inc zeropage.inc sys.inc
 	cl65 -c -t c64 -o $@ $<
 
 sprites.o: sprites.asm sprites.inc
