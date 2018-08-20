@@ -5,4 +5,6 @@ j         .byte 8
 .endstruct
 
           .global init_bullets
+          .global create_bullet
+          .global update_bullets
           .global bullets

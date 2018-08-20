@@ -28,4 +28,4 @@ input.o: input.asm input.inc zeropage.inc
 	cl65 -c -t c64 -o $@ $<
 
 clean:
-	rm -f test.d64 spacekill spacekill.o player.o sprites.o input.o chars.o
+	rm -f test.d64 spacekill spacekill.o player.o bullets.o sprites.o screen.o input.o chars.o
