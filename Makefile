@@ -3,7 +3,7 @@ all: test.d64
 test.d64: spacekill chars
 	c1541 -format test,01 d64 $@ -write spacekill -write chars
 
-spacekill: spacekill.o input.o sprites.o player.o
+spacekill: spacekill.o input.o sprites.o player.o screen.o
 	cl65 -Ln vice.txt -u __EXEHDR__ -C cl65.cfg -o $@ $^
 
 spacekill.o: spacekill.asm input.inc sprites.inc screen.inc zeropage.inc sys.inc
@@ -16,6 +16,9 @@ player.o: player.asm player.inc screen.inc zeropage.inc sys.inc
 	cl65 -c -t c64 -o $@ $<
 
 sprites.o: sprites.asm sprites.inc
+	cl65 -c -t c64 -o $@ $<
+
+screen.o: screen.asm
 	cl65 -c -t c64 -o $@ $<
 
 input.o: input.asm input.inc zeropage.inc
