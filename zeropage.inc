@@ -1,1 +1,16 @@
 INPUT     = $02
+_a        = $03
+_b        = $04
+_c        = $05
+_d        = $06
+_e        = $07
+_f        = $08
+x_chr     = $09
+y_chr     = $0a
+flags     = $0b
+tmp       = $0c
+scr_p     = $0d
+wtmp1     = $0f
+wtmp2     = $11
+wtmp3     = $13
+wtmp4     = $15

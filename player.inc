@@ -17,5 +17,6 @@ by2       .word
 .endstruct
 
           .global init_player
+          .global update_player
           .global player_attrs
           .global player

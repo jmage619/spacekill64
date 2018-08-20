@@ -12,7 +12,7 @@ spacekill.o: spacekill.asm input.inc sprites.inc screen.inc zeropage.inc sys.inc
 chars: chars.asm
 	cl65 -t c64 -C cl65.cfg -o $@ $^
 
-player.o: player.asm player.inc screen.inc sys.inc
+player.o: player.asm player.inc screen.inc zeropage.inc sys.inc
 	cl65 -c -t c64 -o $@ $<
 
 sprites.o: sprites.asm sprites.inc
