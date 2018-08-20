@@ -4,29 +4,12 @@
           .include "screen.inc"
           .include "sprites.inc"
           .include "player.inc"
+          .include "enemies.inc"
           .include "bullets.inc"
 
 CHARS     = $3800
 
 speed     = 2
-
-.scope    EAttrs
-dx        = 0
-dy        = 1
-w         = 2
-h         = 3
-.endscope
-
-.struct   Enemies
-id        .word 8
-sflag     .word 8
-_x        .word 8
-_y        .word 8
-bx1       .word 8
-bx2       .word 8
-by1       .word 8
-by2       .word 8
-.endstruct
 
           .code; custom char set at $3800
           lda #5
@@ -422,9 +405,3 @@ next:     dey
           .data
 chr_fname:
           .byte "chars"
-
-enemy_attrs:
-          .byte 0, 1, 20, 18
-
-          .bss
-enemies:  .tag Enemies
