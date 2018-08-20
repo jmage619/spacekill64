@@ -4,23 +4,11 @@
           .include "screen.inc"
           .include "sprites.inc"
           .include "player.inc"
+          .include "bullets.inc"
 
 CHARS     = $3800
 
 speed     = 2
-
-.scope    Bullet
-dx        = 0
-dy        = 1
-w         = 2
-h         = 3
-.endscope
-
-.struct   Bullets
-flags     .byte 8
-i         .byte 8
-j         .byte 8
-.endstruct
 
 .scope    EAttrs
 dx        = 0
@@ -208,16 +196,6 @@ fire_off: lda flags           ; clear pressed
 update:   jsr update_bullets
 
           jmp mloop
-
-.proc     init_bullets
-          lda #0
-          ldx #0
-next:     sta bullets+Bullets::flags,x
-          inx
-          cpx #8
-          bne next
-          rts
-.endproc
 
 .proc     create_bullet
           ldx #0
@@ -535,11 +513,8 @@ next:     dey
 chr_fname:
           .byte "chars"
 
-bullet_attrs:
-          .byte 0, 2, 8, 4
 enemy_attrs:
           .byte 0, 1, 20, 18
 
           .bss
-bullets:  .tag Bullets
 enemies:  .tag Enemies
