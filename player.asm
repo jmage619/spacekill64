@@ -103,7 +103,7 @@ sy:       lda player+Player::_y         ; update sprite y
           rts
 .endproc
 
-          .rodata
+          .data
 player_attrs:
           .byte 0,0,24,17
 

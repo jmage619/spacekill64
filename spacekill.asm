@@ -661,7 +661,7 @@ next:     dey
           rts
 .endproc
 
-          .rodata
+          .data
 chr_fname:
           .byte "chars"
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
