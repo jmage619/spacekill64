@@ -209,26 +209,6 @@ update:   jsr update_bullets
 
           jmp mloop
 
-.proc     clr_screen
-          ldx #48
-l1:       lda scr_rt,x
-          sta scr_p
-          lda scr_rt+1,x
-          sta scr_p+1
-
-          lda #0
-          ldy #39
-l2:       sta (scr_p),y
-          dey
-          bpl l2
-
-          dex
-          dex
-          bpl l1
-
-          rts
-.endproc
-
 .proc     init_bullets
           lda #0
           ldx #0

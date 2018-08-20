@@ -1,4 +1,26 @@
+          .include "zeropage.inc"
           .include "screen.inc"
+
+          .code
+.proc     clr_screen
+          ldx #48
+l1:       lda scr_rt,x
+          sta scr_p
+          lda scr_rt+1,x
+          sta scr_p+1
+
+          lda #0
+          ldy #39
+l2:       sta (scr_p),y
+          dey
+          bpl l2
+
+          dex
+          dex
+          bpl l1
+
+          rts
+.endproc
 
           .data
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40

@@ -18,7 +18,7 @@ player.o: player.asm player.inc screen.inc zeropage.inc sys.inc
 sprites.o: sprites.asm sprites.inc
 	cl65 -c -t c64 -o $@ $<
 
-screen.o: screen.asm
+screen.o: screen.asm screen.inc zeropage.inc
 	cl65 -c -t c64 -o $@ $<
 
 input.o: input.asm input.inc zeropage.inc
