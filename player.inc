@@ -18,5 +18,6 @@ by2       .word
 
           .global init_player
           .global update_player
+          .global bkg_hit
           .global player_attrs
           .global player
