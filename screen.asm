@@ -3,24 +3,25 @@
 
           .code
 .proc     clr_screen
-          ldx #48
-l1:       lda scr_rt,x
-          sta scr_p
-          lda scr_rt+1,x
-          sta scr_p+1
-
           lda #0
-          ldy #39
-l2:       sta (scr_p),y
-          dey
-          bpl l2
-
-          dex
+          ldx #99
+l1:       sta SCREEN,x
+          sta SCREEN+100,x
+          sta SCREEN+200,x
+          sta SCREEN+300,x
+          sta SCREEN+400,x
+          sta SCREEN+500,x
+          sta SCREEN+600,x
+          sta SCREEN+700,x
+          sta SCREEN+800,x
+          sta SCREEN+900,x
+          
           dex
           bpl l1
-
+          
           rts
 .endproc
+
 
           .data
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
