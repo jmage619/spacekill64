@@ -2,7 +2,7 @@
           .include "sys.inc"
           .include "screen.inc"
           .include "player.inc"
-          .include "sprites.inc"
+          .include "globals.inc"
 
           .code
 .proc     init_player

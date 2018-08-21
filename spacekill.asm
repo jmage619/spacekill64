@@ -2,10 +2,10 @@
           .include "zeropage.inc"
           .include "sys.inc"
           .include "screen.inc"
-          .include "sprites.inc"
           .include "player.inc"
           .include "enemies.inc"
           .include "bullets.inc"
+          .include "globals.inc"
 
 CHARS     = $3800
 LVL       = $4000
@@ -13,7 +13,7 @@ LVL       = $4000
 speed     = 2
 
           .code
-          ; custom char set at $3800
+          ; custom char set loaded into $3800
           lda #5
           ldx #<chr_fname
           ldy #>chr_fname
@@ -27,7 +27,21 @@ speed     = 2
           lda #0
           jsr LOAD
 
-          ; level at $4000
+          ; sprites loaded into $2000
+          lda #7
+          ldx #<spr_fname
+          ldy #>spr_fname
+          jsr SETNAM
+          lda #1
+          ldx #8
+          ldy #0
+          jsr SETLFS
+          ldx #<sprite
+          ldy #>sprite
+          lda #0
+          jsr LOAD
+
+          ; level loaded into $4000
           lda #5
           ldx #<lvl_fname
           ldy #>lvl_fname
@@ -199,5 +213,7 @@ update:   jsr update_bullets
           .data
 chr_fname:
           .byte "chars"
+spr_fname:
+          .byte "sprites"
 lvl_fname:
           .byte "level"

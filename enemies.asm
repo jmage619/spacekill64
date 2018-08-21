@@ -2,7 +2,7 @@
           .include "zeropage.inc"
           .include "enemies.inc"
           .include "screen.inc"
-          .include "sprites.inc"
+          .include "globals.inc"
 
           .code
 .proc     init_enemies
