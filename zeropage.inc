@@ -14,3 +14,4 @@ wtmp1     = $0f
 wtmp2     = $11
 wtmp3     = $13
 wtmp4     = $15
+data_ptr  = $20

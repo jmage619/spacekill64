@@ -8,10 +8,12 @@
           .include "bullets.inc"
 
 CHARS     = $3800
+LVL       = $4000
 
 speed     = 2
 
-          .code; custom char set at $3800
+          .code
+          ; custom char set at $3800
           lda #5
           ldx #<chr_fname
           ldy #>chr_fname
@@ -22,6 +24,20 @@ speed     = 2
           jsr SETLFS
           ldx #<CHARS
           ldy #>CHARS
+          lda #0
+          jsr LOAD
+
+          ; level at $4000
+          lda #5
+          ldx #<lvl_fname
+          ldy #>lvl_fname
+          jsr SETNAM
+          lda #1
+          ldx #8
+          ldy #0
+          jsr SETLFS
+          ldx #<LVL
+          ldy #>LVL
           lda #0
           jsr LOAD
 
@@ -183,3 +199,5 @@ update:   jsr update_bullets
           .data
 chr_fname:
           .byte "chars"
+lvl_fname:
+          .byte "level"

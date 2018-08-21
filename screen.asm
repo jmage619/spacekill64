@@ -22,6 +22,399 @@ l1:       sta SCREEN,x
           rts
 .endproc
 
+.proc     fill_scrcol
+          ldy #0
+          lda (data_ptr),y
+          sta SCREEN+39
+          iny
+          lda (data_ptr),y
+          sta SCREEN+79
+          iny
+          lda (data_ptr),y
+          sta SCREEN+119
+          iny
+          lda (data_ptr),y
+          sta SCREEN+159
+          iny
+          lda (data_ptr),y
+          sta SCREEN+199
+          iny
+          lda (data_ptr),y
+          sta SCREEN+239
+          iny
+          lda (data_ptr),y
+          sta SCREEN+279
+          iny
+          lda (data_ptr),y
+          sta SCREEN+319
+          iny
+          lda (data_ptr),y
+          sta SCREEN+359
+          iny
+          lda (data_ptr),y
+          sta SCREEN+399
+          iny
+          lda (data_ptr),y
+          sta SCREEN+439
+          iny
+          lda (data_ptr),y
+          sta SCREEN+479
+          iny
+          lda (data_ptr),y
+          sta SCREEN+519
+          iny
+          lda (data_ptr),y
+          sta SCREEN+559
+          iny
+          lda (data_ptr),y
+          sta SCREEN+599
+          iny
+          lda (data_ptr),y
+          sta SCREEN+639
+          iny
+          lda (data_ptr),y
+          sta SCREEN+679
+          iny
+          lda (data_ptr),y
+          sta SCREEN+719
+          iny
+          lda (data_ptr),y
+          sta SCREEN+759
+          iny
+          lda (data_ptr),y
+          sta SCREEN+799
+          iny
+          lda (data_ptr),y
+          sta SCREEN+839
+          iny
+          lda (data_ptr),y
+          sta SCREEN+879
+          iny
+          lda (data_ptr),y
+          sta SCREEN+919
+          iny
+          lda (data_ptr),y
+          sta SCREEN+959
+          iny
+          lda (data_ptr),y
+          sta SCREEN+999
+
+return:   rts
+.endproc
+
+.proc     fill_scrcol2
+          ldy #0
+          lda (data_ptr),y
+          sta SCREEN2+39
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+79
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+119
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+159
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+199
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+239
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+279
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+319
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+359
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+399
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+439
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+479
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+519
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+559
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+599
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+639
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+679
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+719
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+759
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+799
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+839
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+879
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+919
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+959
+          iny
+          lda (data_ptr),y
+          sta SCREEN2+999
+
+return:   rts
+.endproc
+
+.proc     shift_scr
+          cpx #0
+          bne chk1
+          ldy #0
+l0:       lda SCREEN2+1,y
+          sta SCREEN,y
+          lda SCREEN2+40+1,y
+          sta SCREEN+40,y
+          lda SCREEN2+80+1,y
+          sta SCREEN+80,y
+          iny
+          cpy #39
+          bne l0
+          jmp return
+
+chk1:     cpx #1
+          bne chk2
+          ldy #0
+l1:       lda SCREEN2+120+1,y
+          sta SCREEN+120,y
+          lda SCREEN2+160+1,y
+          sta SCREEN+160,y
+          lda SCREEN2+200+1,y
+          sta SCREEN+200,y
+          iny
+          cpy #39
+          bne l1
+          jmp return
+
+chk2:     cpx #2
+          bne chk3
+          ldy #0
+l2:       lda SCREEN2+240+1,y
+          sta SCREEN+240,y
+          lda SCREEN2+280+1,y
+          sta SCREEN+280,y
+          lda SCREEN2+320+1,y
+          sta SCREEN+320,y
+          iny
+          cpy #39
+          bne l2
+          jmp return
+
+chk3:     cpx #3
+          bne chk4
+          ldy #0
+l3:       lda SCREEN2+360+1,y
+          sta SCREEN+360,y
+          lda SCREEN2+400+1,y
+          sta SCREEN+400,y
+          lda SCREEN2+440+1,y
+          sta SCREEN+440,y
+          iny
+          cpy #39
+          bne l3
+          jmp return
+
+chk4:     cpx #4
+          bne chk5
+          ldy #0
+l4:       lda SCREEN2+480+1,y
+          sta SCREEN+480,y
+          lda SCREEN2+520+1,y
+          sta SCREEN+520,y
+          lda SCREEN2+560+1,y
+          sta SCREEN+560,y
+          iny
+          cpy #39
+          bne l4
+          jmp return
+
+chk5:     cpx #5
+          bne chk6
+          ldy #0
+l5:       lda SCREEN2+600+1,y
+          sta SCREEN+600,y
+          lda SCREEN2+640+1,y
+          sta SCREEN+640,y
+          lda SCREEN2+680+1,y
+          sta SCREEN+680,y
+          iny
+          cpy #39
+          bne l5
+          jmp return
+
+chk6:     cpx #6
+          bne s7
+          ldy #0
+l6:       lda SCREEN2+720+1,y
+          sta SCREEN+720,y
+          lda SCREEN2+760+1,y
+          sta SCREEN+760,y
+          lda SCREEN2+800+1,y
+          sta SCREEN+800,y
+          iny
+          cpy #39
+          bne l6
+          jmp return
+
+s7:
+          ldy #0
+l7:       lda SCREEN2+840+1,y
+          sta SCREEN+840,y
+          lda SCREEN2+880+1,y
+          sta SCREEN+880,y
+          lda SCREEN2+920+1,y
+          sta SCREEN+920,y
+          lda SCREEN2+960+1,y
+          sta SCREEN+960,y
+          iny
+          cpy #39
+          beq return
+          jmp l7
+
+return:   rts
+.endproc
+
+.proc     shift_scr2
+          cpx #0
+          bne chk1
+          ldy #0
+l0:       lda SCREEN+1,y
+          sta SCREEN2,y
+          lda SCREEN+40+1,y
+          sta SCREEN2+40,y
+          lda SCREEN+80+1,y
+          sta SCREEN2+80,y
+          iny
+          cpy #39
+          bne l0
+          jmp return
+
+chk1:     cpx #1
+          bne chk2
+          ldy #0
+l1:       lda SCREEN+120+1,y
+          sta SCREEN2+120,y
+          lda SCREEN+160+1,y
+          sta SCREEN2+160,y
+          lda SCREEN+200+1,y
+          sta SCREEN2+200,y
+          iny
+          cpy #39
+          bne l1
+          jmp return
+
+chk2:     cpx #2
+          bne chk3
+          ldy #0
+l2:       lda SCREEN+240+1,y
+          sta SCREEN2+240,y
+          lda SCREEN+280+1,y
+          sta SCREEN2+280,y
+          lda SCREEN+320+1,y
+          sta SCREEN2+320,y
+          iny
+          cpy #39
+          bne l2
+          jmp return
+
+chk3:     cpx #3
+          bne chk4
+          ldy #0
+l3:       lda SCREEN+360+1,y
+          sta SCREEN2+360,y
+          lda SCREEN+400+1,y
+          sta SCREEN2+400,y
+          lda SCREEN+440+1,y
+          sta SCREEN2+440,y
+          iny
+          cpy #39
+          bne l3
+          jmp return
+
+chk4:     cpx #4
+          bne chk5
+          ldy #0
+l4:       lda SCREEN+480+1,y
+          sta SCREEN2+480,y
+          lda SCREEN+520+1,y
+          sta SCREEN2+520,y
+          lda SCREEN+560+1,y
+          sta SCREEN2+560,y
+          iny
+          cpy #39
+          bne l4
+          jmp return
+
+chk5:     cpx #5
+          bne chk6
+          ldy #0
+l5:       lda SCREEN+600+1,y
+          sta SCREEN2+600,y
+          lda SCREEN+640+1,y
+          sta SCREEN2+640,y
+          lda SCREEN+680+1,y
+          sta SCREEN2+680,y
+          iny
+          cpy #39
+          bne l5
+          jmp return
+
+chk6:     cpx #6
+          bne s7
+          ldy #0
+l6:       lda SCREEN+720+1,y
+          sta SCREEN2+720,y
+          lda SCREEN+760+1,y
+          sta SCREEN2+760,y
+          lda SCREEN+800+1,y
+          sta SCREEN2+800,y
+          iny
+          cpy #39
+          bne l6
+          jmp return
+
+s7:
+          ldy #0
+l7:       lda SCREEN+840+1,y
+          sta SCREEN2+840,y
+          lda SCREEN+880+1,y
+          sta SCREEN2+880,y
+          lda SCREEN+920+1,y
+          sta SCREEN2+920,y
+          lda SCREEN+960+1,y
+          sta SCREEN2+960,y
+          iny
+          cpy #39
+          beq return
+          jmp l7
+
+return:   rts
+.endproc
 
           .data
 scr_rt:   .word SCREEN+ 0*40, SCREEN+ 1*40, SCREEN+ 2*40, SCREEN+ 3*40, SCREEN+ 4*40
