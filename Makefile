@@ -18,7 +18,7 @@ sprites: sprites.asm
 level: level.asm
 	cl65 -t c64 -C cl65.cfg -o $@ $^
 
-bullets.o: bullets.asm bullets.inc screen.inc
+bullets.o: bullets.asm bullets.inc screen.inc globals.inc
 	cl65 -c -t c64 -o $@ $<
 
 enemies.o: enemies.asm enemies.inc screen.inc globals.inc
@@ -27,10 +27,10 @@ enemies.o: enemies.asm enemies.inc screen.inc globals.inc
 player.o: player.asm player.inc screen.inc globals.inc
 	cl65 -c -t c64 -o $@ $<
 
-screen.o: screen.asm screen.inc
+screen.o: screen.asm screen.inc globals.inc
 	cl65 -c -t c64 -o $@ $<
 
-input.o: input.asm input.inc
+input.o: input.asm input.inc globals.inc
 	cl65 -c -t c64 -o $@ $<
 
 clean:

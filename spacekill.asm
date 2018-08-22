@@ -5,7 +5,8 @@
           .include "enemies.inc"
           .include "bullets.inc"
 
-speed     = 2
+SDLY      = 8
+SPEED     = 2
 
           .code
           ; custom char set loaded into $3800
@@ -50,9 +51,14 @@ speed     = 2
           lda #0
           jsr LOAD
 
+          lda #<LVL
+          sta data_ptr
+          lda #>LVL
+          sta data_ptr+1
+
           lda VIC_CTL         ; point to char set
           and #$f0
-          ora #14
+          ora #CHR_PG
           sta VIC_CTL
 
           lda #$0b            ; gray border
@@ -62,6 +68,8 @@ speed     = 2
           sta BKG_CO
 
           jsr clr_screen      ; clear screen
+b1:       jsr clr_screen2     ; clear screen
+
 
           lda #$01
           sta SCREEN + 5 * 40 + 10
@@ -94,6 +102,12 @@ speed     = 2
           jsr update_enemies
 
           jsr init_bullets
+
+          lda #0
+          sta fcnt
+          lda #1
+          sta sflag
+          jsr fill_scrcol2
 
           ldy #0              ; init position
 mloop:    lda #$ff            ; wait until raster hit bottom border
@@ -149,7 +163,7 @@ input:                        ; handle user input
           beq check_R
           lda player+Player::_x
           sec
-          sbc #speed
+          sbc #SPEED
           sta player+Player::_x
           lda player+Player::_x+1
           sbc #0
@@ -160,7 +174,7 @@ check_R:  lda #1<<3
           beq check_U
           lda player+Player::_x
           clc
-          adc #speed
+          adc #SPEED
           sta player+Player::_x
           lda player+Player::_x+1
           adc #0
@@ -171,7 +185,7 @@ check_U:  lda #1
           beq check_D
           lda player+Player::_y
           sec
-          sbc #speed
+          sbc #SPEED
           sta player+Player::_y
 
 check_D:  lda #1<<2
@@ -179,7 +193,7 @@ check_D:  lda #1<<2
           beq upd_pl
           lda player+Player::_y
           clc
-          adc #speed
+          adc #SPEED
           sta player+Player::_y
 
 upd_pl:   jsr update_player
@@ -201,7 +215,51 @@ fire_off: lda flags           ; clear pressed
           and #<~1
           sta flags
 
-update:   jsr update_bullets
+update:   ldx fcnt
+          lda sflag
+          bne shs2
+          jsr shift_scr
+          jmp inc_frm
+
+shs2:     jsr shift_scr2
+
+inc_frm:  inc fcnt
+          lda #SDLY
+          cmp fcnt
+          beq ncol
+          jmp upd_bul
+
+ncol:     lda #0
+          sta fcnt
+          lda data_ptr
+          clc
+          adc #25
+          sta data_ptr
+          lda data_ptr+1
+          adc #0
+          sta data_ptr+1
+
+          lda sflag
+          bne sw2
+
+          lda VIC_CTL
+          and #$0f
+          ora #SCR1_PG
+          sta VIC_CTL
+          jsr fill_scrcol2
+          lda #1
+          sta sflag
+          jmp upd_bul
+
+sw2:      lda VIC_CTL
+          and #$0f
+          ora #SCR2_PG
+          sta VIC_CTL
+          jsr fill_scrcol
+          lda #0
+          sta sflag
+
+upd_bul:  jsr update_bullets
 
           jmp mloop
 

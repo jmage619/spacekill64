@@ -1,7 +1,14 @@
+; literals
+CHR_PG    = 14
+SCR1_PG   = $10
+SCR2_PG   = $d0
+
 ; zero page
 ; zp for main
 tmp       = $02
 flags     = $03
+fcnt      = $04
+sflag     = $05
 
 ; zp for leaf routines
 _a        = $10
@@ -12,10 +19,10 @@ _e        = $14
 _f        = $15
 
 ; word size zp for leaf routines
-wa     = $20
-wb     = $22
-wc     = $24
-wd     = $26
+wa        = $20
+wb        = $22
+wc        = $24
+wd        = $26
 
 ; zp for input
 INPUT     = $30
@@ -32,8 +39,7 @@ SPR_P     = $07f8
 sprite    = $2000
 sprite2   = $2040
 
-SCREEN2   = $2c00
-
+SCREEN2   = $3400
 CHARS     = $3800
 
 ; data

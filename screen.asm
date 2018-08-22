@@ -22,6 +22,26 @@ l1:       sta SCREEN,x
           rts
 .endproc
 
+.proc     clr_screen2
+          lda #0
+          ldx #99
+l1:       sta SCREEN2,x
+          sta SCREEN2+100,x
+          sta SCREEN2+200,x
+          sta SCREEN2+300,x
+          sta SCREEN2+400,x
+          sta SCREEN2+500,x
+          sta SCREEN2+600,x
+          sta SCREEN2+700,x
+          sta SCREEN2+800,x
+          sta SCREEN2+900,x
+
+          dex
+          bpl l1
+
+          rts
+.endproc
+
 .proc     fill_scrcol
           ldy #0
           lda (data_ptr),y
