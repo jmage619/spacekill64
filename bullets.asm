@@ -74,12 +74,20 @@ l1:       lda bullets+Bullets::flags,x
           lda bullets+Bullets::i,x
           asl
           tay
-          lda scr_rt,y
+          lda scr_flag
+          beq scr1
+          lda scr_rt2,y
+          sta scr_p
+          lda scr_rt2 + 1,y
+          sta scr_p + 1
+          jmp set
+
+scr1:     lda scr_rt,y
           sta scr_p
           lda scr_rt + 1,y
           sta scr_p + 1
 
-          ldy bullets+Bullets::j,x
+set:      ldy bullets+Bullets::j,x
           lda #$00                      ; blank out prev on screen
           sta (scr_p),y
 
