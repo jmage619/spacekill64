@@ -105,8 +105,8 @@ b1:       jsr clr_screen2     ; clear screen
 
           lda #0
           sta fcnt
-          lda #1
-          sta sflag
+          lda #0
+          sta scr_flag
           jsr fill_scrcol2
 
           ldy #0              ; init position
@@ -216,8 +216,8 @@ fire_off: lda flags           ; clear pressed
           sta flags
 
 update:   ldx fcnt
-          lda sflag
-          bne shs2
+          lda scr_flag
+          beq shs2
           jsr shift_scr
           jmp inc_frm
 
@@ -239,16 +239,16 @@ ncol:     lda #0
           adc #0
           sta data_ptr+1
 
-          lda sflag
-          bne sw2
+          lda scr_flag
+          beq sw2
 
           lda VIC_CTL
           and #$0f
           ora #SCR1_PG
           sta VIC_CTL
           jsr fill_scrcol2
-          lda #1
-          sta sflag
+          lda #0
+          sta scr_flag
           jmp upd_bul
 
 sw2:      lda VIC_CTL
@@ -256,8 +256,8 @@ sw2:      lda VIC_CTL
           ora #SCR2_PG
           sta VIC_CTL
           jsr fill_scrcol
-          lda #0
-          sta sflag
+          lda #1
+          sta scr_flag
 
 upd_bul:  jsr update_bullets
 

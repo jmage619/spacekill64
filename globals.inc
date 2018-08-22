@@ -8,7 +8,6 @@ SCR2_PG   = $d0
 tmp       = $02
 flags     = $03
 fcnt      = $04
-sflag     = $05
 
 ; zp for leaf routines
 _a        = $10
@@ -28,8 +27,9 @@ wd        = $26
 INPUT     = $30
 
 ; zp for screen
-scr_p     = $40
-data_ptr  = $42
+scr_flag  = $40
+scr_p     = $48
+data_ptr  = $4b
 
 
 ; vic stuff
