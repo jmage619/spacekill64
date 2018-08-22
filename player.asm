@@ -30,6 +30,7 @@ set:      sta player+Player::sflag      ; save sprite flag
           sta player+Player::id         ; save offset
           lda #<(sprite / 64)
           sta SPR_P,y
+          sta SPR_P2,y
           lda #1
           sta SPR_CO,y
 

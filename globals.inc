@@ -40,6 +40,7 @@ sprite    = $2000
 sprite2   = $2040
 
 SCREEN2   = $3400
+SPR_P2    = $37f8
 CHARS     = $3800
 
 ; data

@@ -34,6 +34,7 @@ set:      sta enemies+Enemies::sflag,x  ; save sprite flag
           sta enemies+Enemies::id,x     ; save offset
           lda #<(sprite2 / 64)
           sta SPR_P,y
+          sta SPR_P2,y
           lda #13
           sta SPR_CO,y
 
