@@ -73,23 +73,48 @@ l1:       lda bullets+Bullets::flags,x
           beq next
           lda bullets+Bullets::i,x
           asl
+
           tay
           lda scr_flag
-          beq scr1
+          bne e1
           lda scr_rt2,y
           sta scr_p
           lda scr_rt2 + 1,y
           sta scr_p + 1
-          jmp set
+          jmp clr_buf
 
-scr1:     lda scr_rt,y
+e1:       lda scr_rt,y
           sta scr_p
           lda scr_rt + 1,y
           sta scr_p + 1
 
-set:      ldy bullets+Bullets::j,x
+clr_buf:
+          sty _a
+          ldy bullets+Bullets::j,x
+          lda #$00
+          dey
+          sta (scr_p),y
+
+          ldy _a
+          lda scr_flag
+          beq e2
+          lda scr_rt2,y
+          sta scr_p
+          lda scr_rt2 + 1,y
+          sta scr_p + 1
+          jmp clr_cur
+
+e2:       lda scr_rt,y
+          sta scr_p
+          lda scr_rt + 1,y
+          sta scr_p + 1
+
+clr_cur:  ldy bullets+Bullets::j,x
           lda #$00                      ; blank out prev on screen
           sta (scr_p),y
+          dey
+          sta (scr_p),y                 ; also blank one to the left in case scroll displaced bullet
+          iny
 
           iny
           cpy #40
