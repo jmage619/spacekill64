@@ -1,12 +1,5 @@
+          .include "globals.inc"
           .include "input.inc"
-          .include "zeropage.inc"
-
-SCREEN    = $0400
-KEY_PA    = $dc00
-KEY_PB    = $dc01
-KEY_DA    = $dc02
-KEY_DB    = $dc03
-KEY_INT   = $dc0d
 
 ; kills kernal keyboard interrupts
           .code

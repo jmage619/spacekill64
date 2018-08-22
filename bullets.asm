@@ -1,7 +1,6 @@
-          .include "zeropage.inc"
-          .include "bullets.inc"
-          .include "sys.inc"
+          .include "globals.inc"
           .include "screen.inc"
+          .include "bullets.inc"
 
           .code
 .proc     init_bullets

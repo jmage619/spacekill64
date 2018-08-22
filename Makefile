@@ -6,7 +6,7 @@ test.d64: spacekill chars level sprites
 spacekill: spacekill.o input.o player.o enemies.o bullets.o screen.o
 	cl65 -Ln vice.txt -u __EXEHDR__ -C cl65.cfg -o $@ $^
 
-spacekill.o: spacekill.asm input.inc globals.inc player.inc enemies.inc bullets.inc screen.inc zeropage.inc sys.inc
+spacekill.o: spacekill.asm input.inc globals.inc player.inc enemies.inc bullets.inc screen.inc
 	cl65 -g -c -t c64 -o $@ $<
 
 chars: chars.asm
@@ -18,19 +18,19 @@ sprites: sprites.asm
 level: level.asm
 	cl65 -t c64 -C cl65.cfg -o $@ $^
 
-bullets.o: bullets.asm bullets.inc screen.inc zeropage.inc sys.inc
+bullets.o: bullets.asm bullets.inc screen.inc
 	cl65 -c -t c64 -o $@ $<
 
-enemies.o: enemies.asm enemies.inc screen.inc globals.inc zeropage.inc sys.inc
+enemies.o: enemies.asm enemies.inc screen.inc globals.inc
 	cl65 -c -t c64 -o $@ $<
 
-player.o: player.asm player.inc screen.inc globals.inc zeropage.inc sys.inc
+player.o: player.asm player.inc screen.inc globals.inc
 	cl65 -c -t c64 -o $@ $<
 
-screen.o: screen.asm screen.inc zeropage.inc
+screen.o: screen.asm screen.inc
 	cl65 -c -t c64 -o $@ $<
 
-input.o: input.asm input.inc zeropage.inc
+input.o: input.asm input.inc
 	cl65 -c -t c64 -o $@ $<
 
 clean:

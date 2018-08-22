@@ -1,14 +1,9 @@
+          .include "globals.inc"
           .include "input.inc"
-          .include "zeropage.inc"
-          .include "sys.inc"
           .include "screen.inc"
           .include "player.inc"
           .include "enemies.inc"
           .include "bullets.inc"
-          .include "globals.inc"
-
-CHARS     = $3800
-LVL       = $4000
 
 speed     = 2
 

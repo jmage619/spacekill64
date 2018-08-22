@@ -1,4 +1,4 @@
-          .include "zeropage.inc"
+          .include "globals.inc"
           .include "screen.inc"
 
           .code

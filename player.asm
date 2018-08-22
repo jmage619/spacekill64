@@ -1,8 +1,6 @@
-          .include "zeropage.inc"
-          .include "sys.inc"
+          .include "globals.inc"
           .include "screen.inc"
           .include "player.inc"
-          .include "globals.inc"
 
           .code
 .proc     init_player

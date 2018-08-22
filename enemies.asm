@@ -1,8 +1,6 @@
-          .include "sys.inc"
-          .include "zeropage.inc"
-          .include "enemies.inc"
-          .include "screen.inc"
           .include "globals.inc"
+          .include "screen.inc"
+          .include "enemies.inc"
 
           .code
 .proc     init_enemies
