@@ -1,22 +1,31 @@
 ; zero page
-INPUT     = $02
-_a        = $03
-_b        = $04
-_c        = $05
-_d        = $06
-_e        = $07
-_f        = $08
-x_chr     = $09
-y_chr     = $0a
-flags     = $0b
-tmp       = $0c
-scr_p     = $0d
-wtmp1     = $0f
-wtmp2     = $11
-wtmp3     = $13
-wtmp4     = $15
-data_ptr  = $20
+; zp for main
+tmp       = $02
+flags     = $03
 
+; zp for leaf routines
+_a        = $10
+_b        = $11
+_c        = $12
+_d        = $13
+_e        = $14
+_f        = $15
+
+; word size zp for leaf routines
+wtmp1     = $20
+wtmp2     = $22
+wtmp3     = $24
+wtmp4     = $26
+
+; zp for input
+INPUT     = $30
+
+; zp for screen
+scr_p     = $40
+data_ptr  = $42
+
+
+; vic stuff
 SCREEN    = $0400
 SPR_P     = $07f8
 
@@ -26,6 +35,8 @@ sprite2   = $2040
 SCREEN2   = $2c00
 
 CHARS     = $3800
+
+; data
 LVL       = $4000
 
 ; system
