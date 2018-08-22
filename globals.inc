@@ -12,10 +12,10 @@ _e        = $14
 _f        = $15
 
 ; word size zp for leaf routines
-wtmp1     = $20
-wtmp2     = $22
-wtmp3     = $24
-wtmp4     = $26
+wa     = $20
+wb     = $22
+wc     = $24
+wd     = $26
 
 ; zp for input
 INPUT     = $30

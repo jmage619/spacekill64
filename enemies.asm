@@ -126,15 +126,15 @@ return:   rts
           lda enemies+Enemies::by1,x      ; first row
           sec
           sbc #50
-          sta wtmp1
+          sta wa
           lda enemies+Enemies::by1+1,x
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          lda wtmp1
+          lda wa
           ror
           asl                           ; mult by 2 to get row offset (word sized)
           sta _a
@@ -142,15 +142,15 @@ return:   rts
           lda enemies+Enemies::by2,x    ; last row
           sec
           sbc #50
-          sta wtmp1
+          sta wa
           lda enemies+Enemies::by2+1,x
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          lda wtmp1
+          lda wa
           ror
           asl                           ; mult by 2 to get row offset (word sized)
           sta _b
@@ -158,33 +158,33 @@ return:   rts
           lda enemies+Enemies::bx1,x    ; first col
           sec
           sbc #24
-          sta wtmp1
+          sta wa
           lda enemies+Enemies::bx1+1,x
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
 
-          lda wtmp1
+          lda wa
           sta _c
 
           lda enemies+Enemies::bx2,x    ; last col
           sec
           sbc #24
-          sta wtmp1
+          sta wa
           lda enemies+Enemies::bx2+1,x
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
 
-          lda wtmp1
+          lda wa
           sta _d
 
           stx _f

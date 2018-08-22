@@ -107,15 +107,15 @@ sy:       lda player+Player::_y         ; update sprite y
           lda player+Player::by1        ; first row
           sec
           sbc #50
-          sta wtmp1
+          sta wa
           lda player+Player::by1+1
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          lda wtmp1
+          lda wa
           ror
           asl                           ; mult by 2 to get row offset (word sized)
           sta _a
@@ -123,15 +123,15 @@ sy:       lda player+Player::_y         ; update sprite y
           lda player+Player::by2        ; last row
           sec
           sbc #50
-          sta wtmp1
+          sta wa
           lda player+Player::by2+1
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          lda wtmp1
+          lda wa
           ror
           asl                           ; mult by 2 to get row offset (word sized)
           tax
@@ -139,33 +139,33 @@ sy:       lda player+Player::_y         ; update sprite y
           lda player+Player::bx1        ; first col
           sec
           sbc #24
-          sta wtmp1
+          sta wa
           lda player+Player::bx1+1
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
 
-          lda wtmp1
+          lda wa
           sta _b
 
           lda player+Player::bx2        ; last col
           sec
           sbc #24
-          sta wtmp1
+          sta wa
           lda player+Player::bx2+1
           sbc #0
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
           lsr
-          ror wtmp1
+          ror wa
 
-          lda wtmp1
+          lda wa
           sta _c
 
 l1:       lda scr_rt,x

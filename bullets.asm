@@ -27,24 +27,24 @@ coords:   lda bullets+Bullets::flags,x
           ora #1
           sta bullets+Bullets::flags,x
           lda #0              ; convert sprite coords to char coords
-          sta wtmp1+1          ; store sprite x to tmp var to handle
+          sta wa+1          ; store sprite x to tmp var to handle
           lda #1              ; hi bit
           bit SPR_MX
           beq lo
-          sta wtmp1+1
+          sta wa+1
 
 lo:       lda SPR_X
-          sta wtmp1
+          sta wa
 
           sec                 ; border compensation
           sbc #24
-          sta wtmp1
-          lda wtmp1 + 1
+          sta wa
+          lda wa + 1
           sbc #0
-          sta wtmp1 + 1
+          sta wa + 1
 
-          lda wtmp1
-          lsr wtmp1 + 1        ; divide by 8
+          lda wa
+          lsr wa + 1        ; divide by 8
           ror
           lsr
           lsr
