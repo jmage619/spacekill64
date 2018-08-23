@@ -43,6 +43,18 @@ lo:       lda SPR_X
           sbc #0
           sta wa + 1
 
+          lda VIC_MOD                   ; get scroll pos
+          and #07
+          sta _a
+
+          lda wa                        ; subtract scroll
+          sec
+          sbc _a
+          sta wa
+          lda wa+1
+          sbc #0
+          sta wa+1
+
           lda wa
           lsr wa + 1        ; divide by 8
           ror
