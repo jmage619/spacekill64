@@ -107,6 +107,12 @@ b1:       jsr clr_screen2     ; clear screen
           sta fcnt
           lda #0
           sta scr_flag
+
+          lda VIC_MOD
+          and #$f8
+          ora #7
+          sta VIC_MOD
+
           jsr fill_scrcol2
 
           ldy #0              ; init position
@@ -227,10 +233,17 @@ inc_frm:  inc fcnt
           lda #SDLY
           cmp fcnt
           beq ncol
+
+          dec VIC_MOD
           jmp upd_bul
 
 ncol:     lda #0
           sta fcnt
+          lda VIC_MOD
+          and #$f8
+          ora #7
+          sta VIC_MOD
+
           lda data_ptr
           clc
           adc #25

@@ -49,6 +49,7 @@ LVL       = $4000
 ; system
 SCR_CO    = $d800
 RST_LN    = $d012
+VIC_MOD   = $d016
 VIC_CTL   = $d018
 INT_STA   = $d019
 BDR_CO    = $d020
