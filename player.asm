@@ -137,13 +137,29 @@ sy:       lda player+Player::_y         ; update sprite y
           asl                           ; mult by 2 to get row offset (word sized)
           tax
 
+          lda VIC_MOD                   ; get scroll pos
+          and #07
+          sta _f
           lda player+Player::bx1        ; first col
-          sec
+          sec                           ; subtract screen border
           sbc #24
           sta wa
           lda player+Player::bx1+1
           sbc #0
-          lsr
+          sta wa+1
+
+          lda wa                        ; subtract scroll
+          sec
+          sbc _f
+          sta wa
+          lda wa+1
+          sbc #0
+          bpl e1                        ; set to 0 if negative
+
+          lda #0
+          jmp s1
+
+e1:       lsr
           ror wa
           lsr
           ror wa
@@ -151,7 +167,7 @@ sy:       lda player+Player::_y         ; update sprite y
           ror wa
 
           lda wa
-          sta _b
+s1:       sta _b
 
           lda player+Player::bx2        ; last col
           sec
@@ -159,6 +175,15 @@ sy:       lda player+Player::_y         ; update sprite y
           sta wa
           lda player+Player::bx2+1
           sbc #0
+          sta wa+1
+
+          lda wa                        ; subtract scroll
+          sec
+          sbc _f
+          sta wa
+          lda wa+1
+          sbc #0
+
           lsr
           ror wa
           lsr
