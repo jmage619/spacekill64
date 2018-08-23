@@ -167,5 +167,48 @@ disable:  lda bullets+Bullets::flags,x
           jmp next
 .endproc
 
+.proc     init_bulchr
+          lda #%00000000      ; define player bullet at $80 and $81
+          sta BULCHR
+          sta BULCHR+$1
+          sta BULCHR+$6
+          sta BULCHR+$7
+          sta BULCHR+$8
+          sta BULCHR+$9
+          sta BULCHR+$a
+          sta BULCHR+$b
+          sta BULCHR+$c
+          sta BULCHR+$d
+          sta BULCHR+$e
+          sta BULCHR+$f
+          lda #%00111100
+          sta BULCHR+$2
+          sta BULCHR+$5
+          lda #%11111111
+          sta BULCHR+$3
+          sta BULCHR+$4
+          rts
+.endproc
+
+.proc     shift_bulchr
+          lsr BULCHR
+          ror BULCHR+$8
+          lsr BULCHR+$1
+          ror BULCHR+$9
+          lsr BULCHR+$2
+          ror BULCHR+$a
+          lsr BULCHR+$3
+          ror BULCHR+$b
+          lsr BULCHR+$4
+          ror BULCHR+$c
+          lsr BULCHR+$5
+          ror BULCHR+$d
+          lsr BULCHR+$6
+          ror BULCHR+$e
+          lsr BULCHR+$7
+          ror BULCHR+$f
+          rts
+.endproc
+
           .bss
 bullets:  .tag Bullets

@@ -7,4 +7,6 @@ j         .byte 8
           .global init_bullets
           .global create_bullet
           .global update_bullets
+          .global init_bulchr
+          .global shift_bulchr
           .global bullets

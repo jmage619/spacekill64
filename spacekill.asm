@@ -56,6 +56,8 @@ SPEED     = 2
           lda #>LVL
           sta data_ptr+1
 
+          jsr init_bulchr
+
           lda VIC_CTL         ; point to char set
           and #$f0
           ora #CHR_PG
@@ -235,6 +237,7 @@ inc_frm:  inc fcnt
           beq ncol
 
           dec VIC_MOD
+          jsr shift_bulchr
           jmp upd_bul
 
 ncol:     lda #0
@@ -251,6 +254,8 @@ ncol:     lda #0
           lda data_ptr+1
           adc #0
           sta data_ptr+1
+
+          jsr init_bulchr
 
           lda scr_flag
           beq sw2

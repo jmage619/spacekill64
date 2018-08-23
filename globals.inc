@@ -44,6 +44,8 @@ SCREEN2   = $3400
 SPR_P2    = $37f8
 CHARS     = $3800
 
+BULCHR    = $3c00
+
 ; data
 LVL       = $4000
 
