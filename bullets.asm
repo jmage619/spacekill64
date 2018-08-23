@@ -112,17 +112,22 @@ e2:       lda scr_rt,y
 clr_cur:  ldy bullets+Bullets::j,x
           lda #$00                      ; blank out prev on screen
           sta (scr_p),y
+          cmp fcnt                      ; also blank one to the left if scroll displaced bullet
+          bne s1
           dey
-          sta (scr_p),y                 ; also blank one to the left in case scroll displaced bullet
+          sta (scr_p),y
           iny
 
-          iny
+s1:       iny
           cpy #40
           beq disable
 
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
           lda #$80
+          sta (scr_p),y
+          iny
+          lda #$81
           sta (scr_p),y
 next:     inx
           cpx #8

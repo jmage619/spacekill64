@@ -7,7 +7,6 @@ SCR2_PG   = $d0
 ; zp for main
 tmp       = $02
 flags     = $03
-fcnt      = $04
 
 ; zp for leaf routines
 _a        = $10
@@ -27,7 +26,8 @@ wd        = $26
 INPUT     = $30
 
 ; zp for screen
-scr_flag  = $40
+fcnt      = $40
+scr_flag  = $41
 scr_p     = $48
 data_ptr  = $4b
 
