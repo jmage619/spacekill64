@@ -119,9 +119,11 @@ clr_cur:  ldy bullets+Bullets::j,x
           iny
 
 s1:       iny
+          iny
           cpy #40
           beq disable
 
+          dey
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
           lda #$80
