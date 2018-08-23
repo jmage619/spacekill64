@@ -156,13 +156,30 @@ return:   rts
           asl                           ; mult by 2 to get row offset (word sized)
           sta _b
 
+          lda VIC_MOD                   ; get scroll pos
+          and #07
+          sta _g
+
           lda enemies+Enemies::bx1,x    ; first col
           sec
           sbc #24
           sta wa
           lda enemies+Enemies::bx1+1,x
           sbc #0
-          lsr
+          sta wa+1
+
+          lda wa                        ; subtract scroll
+          sec
+          sbc _g
+          sta wa
+          lda wa+1
+          sbc #0
+          bpl e1                        ; set to 0 if negative
+
+          lda #0
+          jmp s1
+
+e1:       lsr
           ror wa
           lsr
           ror wa
@@ -170,7 +187,7 @@ return:   rts
           ror wa
 
           lda wa
-          sta _c
+s1:       sta _c
 
           lda enemies+Enemies::bx2,x    ; last col
           sec
@@ -178,6 +195,15 @@ return:   rts
           sta wa
           lda enemies+Enemies::bx2+1,x
           sbc #0
+          sta wa+1
+
+          lda wa                        ; subtract scroll
+          sec
+          sbc _g
+          sta wa
+          lda wa+1
+          sbc #0
+
           lsr
           ror wa
           lsr

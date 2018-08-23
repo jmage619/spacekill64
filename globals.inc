@@ -15,6 +15,7 @@ _c        = $12
 _d        = $13
 _e        = $14
 _f        = $15
+_g        = $16
 
 ; word size zp for leaf routines
 wa        = $20
