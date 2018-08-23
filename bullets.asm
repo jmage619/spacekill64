@@ -128,6 +128,12 @@ e3:       iny                           ; otherwise blank one to right
 s3:       iny
           cpy #39
           beq disable
+          lda (scr_p),y
+          bne disable
+          iny
+          lda (scr_p),y
+          bne disable
+          dey
 
           tya
           sta bullets+Bullets::j,x      ; update bullet on screen
@@ -138,9 +144,10 @@ s3:       iny
           sta (scr_p),y
 next:     inx
           cpx #8
-          bne l1
+          beq return
+          jmp l1
 
-          rts
+return:   rts
 
 disable:  lda bullets+Bullets::flags,x
           and #<~1
