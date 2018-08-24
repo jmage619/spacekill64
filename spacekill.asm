@@ -9,8 +9,7 @@ SDLY      = 8
 SPEED     = 2
 
           .code
-          ; custom char set loaded into $3800
-          lda #5
+          lda #5                        ; custom char set loaded into $3800
           ldx #<chr_fname
           ldy #>chr_fname
           jsr SETNAM
@@ -23,8 +22,8 @@ SPEED     = 2
           lda #0
           jsr LOAD
 
-          ; sprites loaded into $2000
-          lda #7
+
+          lda #7                        ; sprites loaded into $2000
           ldx #<spr_fname
           ldy #>spr_fname
           jsr SETNAM
@@ -37,8 +36,7 @@ SPEED     = 2
           lda #0
           jsr LOAD
 
-          ; level loaded into $4000
-          lda #5
+          lda #5                        ; level loaded into $4000
           ldx #<lvl_fname
           ldy #>lvl_fname
           jsr SETNAM
@@ -51,26 +49,26 @@ SPEED     = 2
           lda #0
           jsr LOAD
 
-          lda #<LVL
+          lda #<LVL                     ; init level data
           sta data_ptr
           lda #>LVL
           sta data_ptr+1
 
           jsr init_bulchr
 
-          lda VIC_CTL         ; point to char set
+          lda VIC_CTL                   ; point to char set
           and #$f0
           ora #CHR_PG
           sta VIC_CTL
 
-          lda #$0b            ; gray border
+          lda #$0b                      ; gray border
           sta BDR_CO          
 
-          lda #$00            ; black background
+          lda #$00                      ; black background
           sta BKG_CO
 
-          jsr clr_screen      ; clear screen
-b1:       jsr clr_screen2     ; clear screen
+          jsr clr_screen                ; clear screen
+b1:       jsr clr_screen2               ; clear screen
 
 
           lda #$01
@@ -105,24 +103,24 @@ b1:       jsr clr_screen2     ; clear screen
 
           jsr init_bullets
 
-          lda #0
+          lda #0                        ; init frame counter
           sta fcnt
-          lda #0
+          lda #0                        ; start on screen 0
           sta scr_flag
 
-          lda VIC_MOD
+          lda VIC_MOD                   ; init full scroll
           and #$f8
           ora #7
           sta VIC_MOD
 
           jsr fill_scrcol2
 
-          ldy #0              ; init position
-mloop:    lda #$ff            ; wait until raster hit bottom border
+          ldy #0                        ; init position
+mloop:    lda #$ff                      ; wait until raster hit bottom border
 l1:       cmp RST_LN
           bne l1
 
-          jsr read_input      ; get input
+          jsr read_input                ; get input
 
           lda SPR_CLB                   ; test if player hit background
           sta tmp                       ; store bkg collision for enemy tests
@@ -132,12 +130,12 @@ l1:       cmp RST_LN
           and #1
           beq no_hit
 
-          lda #2              ; color red if hit
+          lda #2                        ; color red if hit
           ldx player+Player::id
           sta SPR_CO,x
           jmp echk
 
-no_hit:   lda #1              ; otherwise color white
+no_hit:   lda #1                        ; otherwise color white
           ldx player+Player::id
           sta SPR_CO,x
 
@@ -152,7 +150,7 @@ l2:       lda enemies+Enemies::id,x
           and #1<<1
           beq eno_hit
 
-          lda #2
+          lda #2                        ; color red if hit, white if not
           ldy enemies+Enemies::id,x
           sta SPR_CO,y
           jmp n2
@@ -165,8 +163,8 @@ n2:       dex
           dex
           bpl l2
 
-input:                        ; handle user input
-          lda #1<<1           ; check L
+input:                                  ; handle user input
+          lda #1<<1                     ; check L
           bit INPUT
           beq check_R
           lda player+Player::_x
@@ -206,24 +204,24 @@ check_D:  lda #1<<2
 
 upd_pl:   jsr update_player
 
-          lda #1<<4           ; shoot if K pressed
+          lda #1<<4                     ; shoot if K pressed
           bit INPUT
           beq fire_off
 
-          lda #1              ; only fire if not pressed previously
+          lda #1                        ; only fire if not pressed previously
           bit flags
           bne fire_on
           jsr create_bullet
-fire_on:  lda flags           ; set pressed
+fire_on:  lda flags                     ; set pressed
           ora #1
           sta flags
           jmp update
 
-fire_off: lda flags           ; clear pressed
+fire_off: lda flags                     ; clear pressed
           and #<~1
           sta flags
 
-update:   ldx fcnt
+update:   ldx fcnt                      ; fill back buf
           lda scr_flag
           beq shs2
           jsr shift_scr
@@ -231,7 +229,7 @@ update:   ldx fcnt
 
 shs2:     jsr shift_scr2
 
-inc_frm:  inc fcnt
+inc_frm:  inc fcnt                      ; inc frame and scroll
           lda #SDLY
           cmp fcnt
           beq ncol
@@ -240,14 +238,16 @@ inc_frm:  inc fcnt
           jsr shift_bulchr
           jmp upd_bul
 
-ncol:     lda #0
+ncol:     lda #0                        ; reset scroll every 8 frames
           sta fcnt
           lda VIC_MOD
           and #$f8
           ora #7
           sta VIC_MOD
 
-          lda data_ptr
+          jsr init_bulchr
+
+          lda data_ptr                  ; get next level column
           clc
           adc #25
           sta data_ptr
@@ -255,9 +255,7 @@ ncol:     lda #0
           adc #0
           sta data_ptr+1
 
-          jsr init_bulchr
-
-          lda scr_flag
+          lda scr_flag                  ; fill next col and swap screens
           beq sw2
 
           lda VIC_CTL
