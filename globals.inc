@@ -6,6 +6,7 @@ SCR2_PG   = $d0
 ; zero page
 tmp       = $02                         ; zp for main
 flags     = $03
+hit_dly   = $04
 
 _a        = $10                         ; zp for leaf routines
 _b        = $11

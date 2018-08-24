@@ -216,12 +216,21 @@ s1:       sta _c
 
           stx _f
           ldx _b
-l1:       lda scr_rt,x                  ; traverse tile rows to find hits
+
+l1:       lda scr_flag
+          bne e2
+          lda scr_rt,x                  ; traverse tile rows to find hits
           sta scr_p
           lda scr_rt+1,x
           sta scr_p+1
+          jmp s2
 
-          ldy _d
+e2:       lda scr_rt2,x                 ; swap rowtable if screen 2
+          sta scr_p
+          lda scr_rt2+1,x
+          sta scr_p+1
+
+s2:       ldy _d
 l2:       lda (scr_p),y                 ; inner loop traverses columns
           beq next                      ; skip to next tile if empty
           and #$80                      ; bkg tile hit?

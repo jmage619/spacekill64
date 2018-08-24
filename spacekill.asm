@@ -68,7 +68,7 @@ SPEED     = 2
           sta BKG_CO
 
           jsr clr_screen                ; clear screen
-b1:       jsr clr_screen2               ; clear screen
+          jsr clr_screen2               ; clear screen
 
 
           lda #$01
@@ -86,7 +86,7 @@ b1:       jsr clr_screen2               ; clear screen
 
           jsr update_player
 
-          jsr init_enemies
+b0:       jsr init_enemies
 
           lda #255
           sta enemies+Enemies::_x
@@ -100,6 +100,9 @@ b1:       jsr clr_screen2               ; clear screen
           ldx #0
           jsr create_enemy
           jsr update_enemies
+
+          lda #0
+          sta hit_dly
 
           jsr init_bullets
 
@@ -146,16 +149,23 @@ l2:       lda enemies+Enemies::id,x
           lda tmp
           and enemies+Enemies::sflag,x
           beq eno_hit
-          jsr ebkg_hit
+b1:       jsr ebkg_hit
           and #1<<1
           beq eno_hit
 
           lda #2                        ; color red if hit, white if not
           ldy enemies+Enemies::id,x
           sta SPR_CO,y
+          lda #4
+          sta hit_dly
           jmp n2
 
-eno_hit:  lda #13
+eno_hit:  lda hit_dly
+          beq e1
+          dec hit_dly
+          jmp n2
+
+e1:       lda #13
           ldy enemies+Enemies::id,x
           sta SPR_CO,y
 
