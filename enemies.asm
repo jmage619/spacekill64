@@ -51,7 +51,7 @@ l1:       lda enemies+Enemies::id,y
 
           jmp return
 
-update:   lda enemies+Enemies::_x,y         ; update bounding box x sides
+update:   lda enemies+Enemies::_x,y     ; update bounding box x sides
           clc
           adc enemy_attrs+EAttrs::dx
           sta enemies+Enemies::bx1,y
@@ -59,7 +59,7 @@ update:   lda enemies+Enemies::_x,y         ; update bounding box x sides
           adc #0
           sta enemies+Enemies::bx1+1,y
 
-          lda enemy_attrs+EAttrs::w    ; subtract 1 from w to get rhs
+          lda enemy_attrs+EAttrs::w     ; subtract 1 from w to get rhs
           sta _a
           dec _a
 
@@ -71,7 +71,7 @@ update:   lda enemies+Enemies::_x,y         ; update bounding box x sides
           adc #0
           sta enemies+Enemies::bx2+1,y
 
-          lda enemies+Enemies::_y,y      ; update bounding box y sides
+          lda enemies+Enemies::_y,y     ; update bounding box y sides
           clc
           adc enemy_attrs+EAttrs::dy
           sta enemies+Enemies::by1,y
@@ -79,7 +79,7 @@ update:   lda enemies+Enemies::_x,y         ; update bounding box x sides
           adc #0
           sta enemies+Enemies::by1+1,y
 
-          lda enemy_attrs+EAttrs::h    ; subtract 1 from h to get bottom
+          lda enemy_attrs+EAttrs::h     ; subtract 1 from h to get bottom
           sta _a
           dec _a
 
@@ -94,7 +94,7 @@ update:   lda enemies+Enemies::_x,y         ; update bounding box x sides
           lda enemies+Enemies::id,y
           asl
           tax
-          lda enemies+Enemies::_x,y         ; update sprite x
+          lda enemies+Enemies::_x,y     ; update sprite x
           sta SPR_X,x
           lda enemies+Enemies::_x+1,y
           beq clrx
@@ -109,7 +109,7 @@ clrx:     lda enemies+Enemies::sflag,y
           and SPR_MX
           sta SPR_MX
 
-sy:       lda enemies+Enemies::_y,y         ; update sprite y
+sy:       lda enemies+Enemies::_y,y     ; update sprite y
           sta SPR_Y,x
 
           dey
@@ -124,8 +124,8 @@ return:   rts
 .proc     ebkg_hit
           lda #0
           sta _e
-          lda enemies+Enemies::by1,x      ; first row
-          sec
+          lda enemies+Enemies::by1,x    ; first row
+          sec                           ; subtract screen border
           sbc #50
           sta wa
           lda enemies+Enemies::by1+1,x
@@ -141,7 +141,7 @@ return:   rts
           sta _a
 
           lda enemies+Enemies::by2,x    ; last row
-          sec
+          sec                           ; subtract screen border
           sbc #50
           sta wa
           lda enemies+Enemies::by2+1,x
@@ -161,7 +161,7 @@ return:   rts
           sta _g
 
           lda enemies+Enemies::bx1,x    ; first col
-          sec
+          sec                           ; subtract screen border
           sbc #24
           sta wa
           lda enemies+Enemies::bx1+1,x
@@ -216,13 +216,13 @@ s1:       sta _c
 
           stx _f
           ldx _b
-l1:       lda scr_rt,x
+l1:       lda scr_rt,x                  ; traverse tile rows to find hits
           sta scr_p
           lda scr_rt+1,x
           sta scr_p+1
 
           ldy _d
-l2:       lda (scr_p),y
+l2:       lda (scr_p),y                 ; inner loop traverses columns
           beq next                      ; skip to next tile if empty
           and #$80                      ; bkg tile hit?
           bne test_pb
