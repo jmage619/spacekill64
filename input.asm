@@ -25,23 +25,23 @@
           lda #$0
           sta KEY_DB
 
-          lda #<~(1<<1)       ; enable A column
+          lda #<~(1<<1)                 ; enable A column
           sta KEY_PA
 
-          lda #1<<2           ; test A
+          lda #1<<2                     ; test A
           bit KEY_PB
           bne offa
 
-          lda INPUT           ; if pressed enable
+          lda INPUT                     ; if pressed enable
           ora #1<<1
           sta INPUT
           jmp w
 
-offa:     lda INPUT           ; else disable
+offa:     lda INPUT                     ; else disable
           and #<~(1<<1)
           sta INPUT
 
-w:        lda #$1<<1          ; test W
+w:        lda #$1<<1                    ; test W
           bit KEY_PB
           bne offw
 
@@ -54,7 +54,7 @@ offw:     lda INPUT
           and #<~1
           sta INPUT
 
-s:        lda #$1<<5          ; test S
+s:        lda #$1<<5                    ; test S
           bit KEY_PB
           bne offs
 
@@ -67,10 +67,10 @@ offs:     lda INPUT
           and #<~(1<<2)
           sta INPUT
 
-d:        lda #<~(1<<2)       ; enable D column
+d:        lda #<~(1<<2)                 ; enable D column
           sta KEY_PA
 
-          lda #$1<<2          ; test D
+          lda #$1<<2                    ; test D
           bit KEY_PB
           bne offd
 
@@ -83,10 +83,10 @@ offd:     lda INPUT
           and #<~(1<<3)
           sta INPUT
 
-k:        lda #<~(1<<4)       ; enable K column
+k:        lda #<~(1<<4)                 ; enable K column
           sta KEY_PA
 
-          lda #$1<<5          ; test K
+          lda #$1<<5                    ; test K
           bit KEY_PB
           bne offk
 
@@ -99,10 +99,10 @@ offk:     lda INPUT
           and #<~(1<<4)
           sta INPUT
 
-l:        lda #<~(1<<5)       ; enable L column
+l:        lda #<~(1<<5)                 ; enable L column
           sta KEY_PA
 
-          lda #$1<<2          ; test L
+          lda #$1<<2                    ; test L
           bit KEY_PB
           bne offl
 
