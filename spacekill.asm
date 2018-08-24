@@ -111,8 +111,9 @@ b0:       jsr init_enemies
           lda #0                        ; start on screen 0
           sta scr_flag
 
-          lda VIC_MOD                   ; init full scroll
-          and #$f8
+          lda #<~8
+          and VIC_MOD                   ; 38 columns
+          and #$f8                      ; init full scroll
           ora #7
           sta VIC_MOD
 
