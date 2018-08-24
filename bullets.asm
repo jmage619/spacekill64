@@ -86,7 +86,7 @@ l1:       lda bullets+Bullets::flags,x
           lda bullets+Bullets::i,x
           asl
 
-          tay
+          tay                           ; get screen table for back buf
           lda scr_flag
           bne e1
           lda scr_rt2,y
@@ -100,7 +100,7 @@ e1:       lda scr_rt,y
           lda scr_rt + 1,y
           sta scr_p + 1
 
-clr_buf:
+clr_buf:                                ; clear bullet in back buf
           sty _a
           ldy bullets+Bullets::j,x
           lda #$00
@@ -109,7 +109,7 @@ clr_buf:
           iny
           sta (scr_p),y
 
-          ldy _a
+          ldy _a                        ; get screen table for cur screen
           lda scr_flag
           beq e2
           lda scr_rt2,y
@@ -137,7 +137,7 @@ e3:       iny                           ; otherwise blank one to right
           sta (scr_p),y
           dey
 
-s3:       iny
+s3:       iny                           ; disable if new pos is off screen
           cpy #39
           beq disable
           lda (scr_p),y
@@ -167,8 +167,9 @@ disable:  lda bullets+Bullets::flags,x
           jmp next
 .endproc
 
+ ; define player bullet at $80 and $81
 .proc     init_bulchr
-          lda #%00000000                ; define player bullet at $80 and $81
+          lda #%00000000
           sta BULCHR
           sta BULCHR+$1
           sta BULCHR+$6
@@ -190,6 +191,7 @@ disable:  lda bullets+Bullets::flags,x
           rts
 .endproc
 
+; shift bullet char 1 px to the right
 .proc     shift_bulchr
           lsr BULCHR
           ror BULCHR+$8
