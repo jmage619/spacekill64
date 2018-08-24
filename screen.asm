@@ -42,6 +42,8 @@ l1:       sta SCREEN2,x
           rts
 .endproc
 
+; fill last column of screen
+; from data pointing at data_ptr
 .proc     fill_scrcol
           ldy #0
           lda (data_ptr),y
@@ -202,6 +204,8 @@ return:   rts
 return:   rts
 .endproc
 
+; shift 1/8th of a screen at a time
+; start index inside x reg
 .proc     shift_scr
           cpx #0
           bne chk1
