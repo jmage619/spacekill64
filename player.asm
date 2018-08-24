@@ -106,7 +106,7 @@ sy:       lda player+Player::_y         ; update sprite y
           lda #0
           sta _d
           lda player+Player::by1        ; first row
-          sec
+          sec                           ; subtract screen border
           sbc #50
           sta wa
           lda player+Player::by1+1
@@ -122,7 +122,7 @@ sy:       lda player+Player::_y         ; update sprite y
           sta _a
 
           lda player+Player::by2        ; last row
-          sec
+          sec                           ; subtract screen border
           sbc #50
           sta wa
           lda player+Player::by2+1
@@ -194,13 +194,13 @@ s1:       sta _b
           lda wa
           sta _c
 
-l1:       lda scr_rt,x
+l1:       lda scr_rt,x                  ; traverse tile rows to find hits
           sta scr_p
           lda scr_rt+1,x
           sta scr_p+1
 
           ldy _c
-l2:       lda (scr_p),y
+l2:       lda (scr_p),y                 ; inner loop traverses columns
           beq next                      ; skip to next tile if empty
           and #$80                      ; bkg tile hit?
           bne test_pb
