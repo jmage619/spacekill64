@@ -15,20 +15,20 @@ next:     sta bullets+Bullets::flags,x
 
 .proc     create_bullet
           ldx #0
-l1:       lda bullets+Bullets::flags,x ; look for first available bullet
+l1:       lda bullets+Bullets::flags,x  ; look for first available bullet
           and #1
           beq coords
           inx
           cpx #8
-          beq return                   ; if none available just exit
-          jmp l1
+          beq return                    ; if none available just exit
+          jmp l1;
 
 coords:   lda bullets+Bullets::flags,x
           ora #1
           sta bullets+Bullets::flags,x
-          lda #0              ; convert sprite coords to char coords
-          sta wa+1          ; store sprite x to tmp var to handle
-          lda #1              ; hi bit
+          lda #0                        ; convert sprite coords to char coords
+          sta wa+1                      ; store sprite x to tmp var to handle
+          lda #1                        ; hi bit
           bit SPR_MX
           beq lo
           sta wa+1
@@ -36,7 +36,7 @@ coords:   lda bullets+Bullets::flags,x
 lo:       lda SPR_X
           sta wa
 
-          sec                 ; border compensation
+          sec                           ; border compensation
           sbc #24
           sta wa
           lda wa + 1
@@ -56,24 +56,24 @@ lo:       lda SPR_X
           sta wa+1
 
           lda wa
-          lsr wa + 1        ; divide by 8
+          lsr wa + 1                    ; divide by 8
           ror
           lsr
           lsr
 
           clc
-          adc #2              ; correct x pos rel to sprite
+          adc #2                        ; correct x pos rel to sprite
           sta bullets+Bullets::j,x
 
-          lda SPR_Y           ; get y
+          lda SPR_Y                     ; get y
           sec
-          sbc #50             ; border compensation
-          lsr                 ; divide by 8
+          sbc #50                       ; border compensation
+          lsr                           ; divide by 8
           lsr
           lsr
 
           clc
-          adc #1              ; correct y pos rel to sprite
+          adc #1                        ; correct y pos rel to sprite
           sta bullets+Bullets::i,x
 return:   rts
 .endproc
@@ -168,7 +168,7 @@ disable:  lda bullets+Bullets::flags,x
 .endproc
 
 .proc     init_bulchr
-          lda #%00000000      ; define player bullet at $80 and $81
+          lda #%00000000                ; define player bullet at $80 and $81
           sta BULCHR
           sta BULCHR+$1
           sta BULCHR+$6
