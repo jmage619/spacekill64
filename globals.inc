@@ -4,12 +4,10 @@ SCR1_PG   = $10
 SCR2_PG   = $d0
 
 ; zero page
-; zp for main
-tmp       = $02
+tmp       = $02                         ; zp for main
 flags     = $03
 
-; zp for leaf routines
-_a        = $10
+_a        = $10                         ; zp for leaf routines
 _b        = $11
 _c        = $12
 _d        = $13
@@ -17,21 +15,17 @@ _e        = $14
 _f        = $15
 _g        = $16
 
-; word size zp for leaf routines
-wa        = $20
+wa        = $20                         ; word size zp for leaf routines
 wb        = $22
 wc        = $24
 wd        = $26
 
-; zp for input
-INPUT     = $30
+INPUT     = $30                         ; zp for input
 
-; zp for screen
-fcnt      = $40
+fcnt      = $40                         ; zp for screen
 scr_flag  = $41
 scr_p     = $48
 data_ptr  = $4b
-
 
 ; vic stuff
 SCREEN    = $0400
